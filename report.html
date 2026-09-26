@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMate — Progress report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  .chart-panel canvas{ max-height: 280px; }
+  .breakdown-row{ display:flex; justify-content:space-between; align-items:center; gap:var(--s-3); padding: var(--s-2) 0; }
+  .breakdown-row .bar{ flex:1; }
+  .breakdown-row .pct{ width:44px; text-align:right; font-family:var(--f-mono); font-size:.85rem; }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="deck-nav">
+      <div class="brand">Prep<span class="dot">Mate</span></div>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="practice.html">Practice zone</a>
+        <a href="interview.html">Mock interview</a>
+        <a href="planner.html">Study planner</a>
+        <a href="report.html" class="active">Progress report</a>
+      </div>
+      <div class="nav-foot">
+        <span id="navUserName">—</span>
+        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
+      </div>
+    </nav>
+
+    <main class="deck-main">
+      <header class="deck-header">
+        <div>
+          <div class="kicker">Self-evaluation</div>
+          <h1>Where you actually stand</h1>
+        </div>
+      </header>
+
+      <div class="grid grid-2" style="margin-bottom: var(--s-6);">
+        <div class="panel chart-panel">
+          <h3>Accuracy by category</h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="panel chart-panel">
+          <h3>Quiz score trend</h3>
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom: var(--s-6);">
+        <h3>Readiness breakdown</h3>
+        <div id="breakdownContainer"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Interview confidence by question</h3>
+        <div id="interviewBreakdown"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/readiness.js"></script>
+  <script>
+    Store.requireAuth();
+    const user = Store.currentUser();
+    document.getElementById("navUserName").textContent = user.name;
+    document.getElementById("logoutBtn").addEventListener("click", ()=>{ Store.logout(); window.location.href="index.html"; });
+
+    const data = Store.getData();
+
+    // chart theme
+    Chart.defaults.color = "#9FAEBA";
+    Chart.defaults.font.family = "Inter, sans-serif";
+    Chart.defaults.borderColor = "#2A3A47";
+
+    const categories = Object.keys(QUIZ_BANK);
+    const categoryAverages = categories.map(c => Readiness.quizAverageByCategory(data, c) || 0);
+
+    new Chart(document.getElementById("categoryChart"), {
+      type: "bar",
+      data: {
+        labels: categories.map(c => QUIZ_CATEGORY_LABELS[c]),
+        datasets: [{
+          label: "Accuracy %",
+          data: categoryAverages,
+          backgroundColor: "#F5A623",
+          borderRadius: 3
+        }]
+      },
+      options: {
+        plugins: { legend: { display:false } },
+        scales: { y: { min:0, max:100, grid:{ color:"#21303C" } }, x: { grid:{ display:false } } }
+      }
+    });
+
+    const attempts = data.quizAttempts.slice(-15);
+    new Chart(document.getElementById("trendChart"), {
+      type: "line",
+      data: {
+        labels: attempts.map((a,i) => "#" + (i+1)),
+        datasets: [{
+          label: "Score %",
+          data: attempts.map(a => Math.round((a.score/a.total)*100)),
+          borderColor: "#3ED598",
+          backgroundColor: "rgba(62,213,152,.15)",
+          tension: .3,
+          fill: true,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        plugins: { legend: { display:false } },
+        scales: { y: { min:0, max:100, grid:{ color:"#21303C" } }, x: { grid:{ display:false } } }
+      }
+    });
+
+    if(!attempts.length){
+      document.getElementById("trendChart").parentElement.innerHTML += '<p class="hint" style="margin-top:var(--s-3);">No quiz attempts yet — this will fill in once you practice.</p>';
+    }
+
+    // readiness breakdown
+    const breakdown = [
+      { label:"Quiz accuracy", val: Readiness.quizAverage(data) },
+      { label:"Interview confidence", val: Readiness.interviewAverage(data) },
+      { label:"Planner completion", val: Readiness.plannerCompletion(data) },
+      { label:"Checklist completion", val: Readiness.checklistCompletion(data) },
+    ];
+    const breakdownEl = document.getElementById("breakdownContainer");
+    breakdown.forEach(b=>{
+      const val = b.val === null ? 0 : b.val;
+      const row = document.createElement("div");
+      row.className = "breakdown-row";
+      row.innerHTML = `
+        <span style="width:180px;color:var(--text-dim);font-size:.9rem;">${b.label}</span>
+        <div class="bar"><span style="width:${val}%"></span></div>
+        <span class="pct">${b.val===null ? "—" : val+"%"}</span>
+      `;
+      breakdownEl.appendChild(row);
+    });
+
+    // interview breakdown
+    const interviewEl = document.getElementById("interviewBreakdown");
+    const allInterviewQs = [...INTERVIEW_QUESTIONS.hr, ...INTERVIEW_QUESTIONS.technical];
+    const rated = allInterviewQs.filter(q => data.interviewRatings[q.id] && data.interviewRatings[q.id].length);
+    if(!rated.length){
+      interviewEl.innerHTML = '<p class="hint">No mock interview questions rated yet.</p>';
+    }else{
+      rated.forEach(q=>{
+        const ratings = data.interviewRatings[q.id];
+        const avg = Math.round((ratings.reduce((s,r)=>s+r,0)/ratings.length)*10)/10;
+        const row = document.createElement("div");
+        row.className = "breakdown-row";
+        row.innerHTML = `
+          <span style="flex:1;color:var(--text-dim);font-size:.88rem;">${q.q}</span>
+          <div class="bar" style="max-width:120px;"><span style="width:${avg/5*100}%"></span></div>
+          <span class="pct">${avg}/5</span>
+        `;
+        interviewEl.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>

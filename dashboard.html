@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMate — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .score-panel{
+    display:flex;
+    align-items:center;
+    gap: var(--s-6);
+    flex-wrap:wrap;
+  }
+  .score-ring{ position:relative; width:130px; height:130px; flex-shrink:0; }
+  .score-ring svg{ transform: rotate(-90deg); width:100%; height:100%; }
+  .score-ring .num{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .score-ring .num .val{ font-family:var(--f-mono); font-size:2rem; font-weight:700; }
+  .score-ring .num .lbl{ font-size:.68rem; color:var(--text-faint); letter-spacing:.03em; }
+
+  .stat-row{ display:flex; gap: var(--s-6); flex-wrap:wrap; }
+  .stat{ min-width: 120px; }
+  .stat .val{ font-family:var(--f-mono); font-size:1.5rem; font-weight:700; }
+  .stat .lbl{ color:var(--text-faint); font-size:.78rem; }
+
+  .module-card h3{ margin-bottom: var(--s-2); }
+  .module-card{ display:flex; flex-direction:column; gap: var(--s-3); }
+  .module-card .go{ margin-top:auto; }
+
+  .weak-note{ display:flex; align-items:center; gap:var(--s-3); }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="deck-nav">
+      <div class="brand">Prep<span class="dot">Mate</span></div>
+      <div class="nav-links">
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="practice.html">Practice zone</a>
+        <a href="interview.html">Mock interview</a>
+        <a href="planner.html">Study planner</a>
+        <a href="report.html">Progress report</a>
+      </div>
+      <div class="nav-foot">
+        <span id="navUserName">—</span>
+        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
+      </div>
+    </nav>
+
+    <main class="deck-main">
+      <header class="deck-header">
+        <div>
+          <div class="kicker">Mission overview</div>
+          <h1 id="greeting">Welcome back</h1>
+        </div>
+      </header>
+
+      <section class="panel score-panel" style="margin-bottom: var(--s-6);">
+        <div class="score-ring">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" stroke="var(--line)" stroke-width="10" fill="none"/>
+            <circle id="scoreArc" cx="60" cy="60" r="52" stroke="var(--amber)" stroke-width="10" fill="none"
+                    stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div class="num">
+            <span class="val" id="scoreVal">0</span>
+            <span class="lbl">READINESS</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="tag" id="scoreBand">Not started</span>
+          <p style="margin-top:var(--s-3);">Your readiness score blends quiz accuracy, mock-interview confidence, planner progress and your final checklist — 25% each.</p>
+          <div class="weak-note" id="weakArea" style="display:none;">
+            <span class="tag tag-red">Focus area</span>
+            <span id="weakAreaText" style="color:var(--text-dim);font-size:.9rem;"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="stat-row panel" style="margin-bottom: var(--s-6);">
+        <div class="stat"><div class="val" id="statQuizzes">0</div><div class="lbl">Quizzes attempted</div></div>
+        <div class="stat"><div class="val" id="statInterview">0</div><div class="lbl">Interview questions rehearsed</div></div>
+        <div class="stat"><div class="val" id="statPlanner">0%</div><div class="lbl">Planner complete</div></div>
+        <div class="stat"><div class="val" id="statChecklist">0%</div><div class="lbl">Checklist complete</div></div>
+        <div class="stat"><div class="val" id="statDays">—</div><div class="lbl">Days to target date</div></div>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="panel module-card">
+          <span class="tag tag-amber">Practice</span>
+          <h3>Practice zone</h3>
+          <p>Timed quizzes across aptitude, core CS, coding logic and verbal ability. Every attempt is saved to your history.</p>
+          <a class="btn btn-primary go" href="practice.html">Start a quiz</a>
+        </div>
+        <div class="panel module-card">
+          <span class="tag tag-amber">Interview</span>
+          <h3>Mock interview</h3>
+          <p>Flip through real HR and technical questions, answer out loud, then rate your own confidence honestly.</p>
+          <a class="btn btn-primary go" href="interview.html">Rehearse questions</a>
+        </div>
+        <div class="panel module-card">
+          <span class="tag tag-amber">Plan</span>
+          <h3>Study planner</h3>
+          <p>A five-track roadmap covering aptitude, CS core, DSA, interview readiness and your resume — set a target date.</p>
+          <a class="btn btn-primary go" href="planner.html">Open planner</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/readiness.js"></script>
+  <script>
+    Store.requireAuth();
+    const user = Store.currentUser();
+    const data = Store.getData();
+
+    document.getElementById("navUserName").textContent = user.name;
+    document.getElementById("greeting").textContent = "Welcome back, " + user.name.split(" ")[0];
+
+    const score = Readiness.overall(data);
+    const band = Readiness.band(score);
+    document.getElementById("scoreVal").textContent = score;
+    document.getElementById("scoreBand").textContent = band.label;
+    document.getElementById("scoreBand").className = "tag " + band.cls;
+
+    const circumference = 2 * Math.PI * 52;
+    const arc = document.getElementById("scoreArc");
+    arc.setAttribute("stroke-dasharray", circumference.toFixed(1));
+    arc.setAttribute("stroke-dashoffset", (circumference * (1 - score/100)).toFixed(1));
+
+    document.getElementById("statQuizzes").textContent = data.quizAttempts.length;
+    document.getElementById("statInterview").textContent = Object.keys(data.interviewRatings).length;
+    document.getElementById("statPlanner").textContent = Readiness.plannerCompletion(data) + "%";
+    document.getElementById("statChecklist").textContent = Readiness.checklistCompletion(data) + "%";
+
+    if(data.targetDate){
+      const days = Math.ceil((new Date(data.targetDate) - new Date()) / 86400000);
+      document.getElementById("statDays").textContent = days >= 0 ? days : "past";
+    }
+
+    const weak = Readiness.weakestArea(data);
+    if(weak){
+      document.getElementById("weakArea").style.display = "flex";
+      document.getElementById("weakAreaText").textContent = weak.key + " is your lowest-scoring category (" + weak.val + "%). Consider practicing it next.";
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", ()=>{
+      Store.logout();
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

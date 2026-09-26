@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMate — Create account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .gate-card{ width: 100%; max-width: 460px; }
+  .gate-brand{ text-align:center; margin-bottom: var(--s-6); }
+  .gate-brand .dot{ color: var(--amber); }
+  .gate-foot{ text-align:center; margin-top: var(--s-4); font-size: .88rem; color: var(--text-dim); }
+</style>
+</head>
+<body>
+  <main class="gate">
+    <div class="gate-card">
+      <div class="gate-brand">
+        <h1 style="margin-bottom:0;">Prep<span class="dot">Mate</span></h1>
+        <p style="max-width:34ch;margin:var(--s-2) auto 0;color:var(--text-faint);font-size:.85rem;">Set up your prep profile in under a minute.</p>
+      </div>
+
+      <form class="panel panel-amber" id="signupForm" novalidate>
+        <h3 style="margin-bottom: var(--s-4);">Create account</h3>
+
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" type="text" placeholder="Ananya Sharma" required>
+        </div>
+
+        <div class="field">
+          <label for="email">College email</label>
+          <input id="email" type="email" autocomplete="username" placeholder="you@college.edu" required>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="branch">Branch / stream</label>
+            <input id="branch" type="text" placeholder="CSE, ECE, MBA...">
+          </div>
+          <div class="field">
+            <label for="gradYear">Graduation year</label>
+            <input id="gradYear" type="number" placeholder="2027" min="2024" max="2032">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="targetRole">Target role</label>
+          <input id="targetRole" type="text" placeholder="SDE Intern, Analyst, ...">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" required minlength="6">
+        </div>
+
+        <div class="field">
+          <label for="password2">Confirm password</label>
+          <input id="password2" type="password" autocomplete="new-password" placeholder="Re-enter password" required minlength="6">
+        </div>
+
+        <button type="submit" class="btn-primary btn-block">Create account</button>
+        <p class="error-msg" id="signupError" role="alert"></p>
+      </form>
+
+      <p class="gate-foot">Already have an account? <a href="index.html">Sign in</a></p>
+    </div>
+  </main>
+
+  <script src="js/store.js"></script>
+  <script>
+    if(Store.currentUserEmail()){ window.location.href = "dashboard.html"; }
+
+    const form = document.getElementById("signupForm");
+    const errorEl = document.getElementById("signupError");
+
+    form.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      errorEl.textContent = "";
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const branch = document.getElementById("branch").value.trim();
+      const gradYear = document.getElementById("gradYear").value.trim();
+      const targetRole = document.getElementById("targetRole").value.trim();
+      const password = document.getElementById("password").value;
+      const password2 = document.getElementById("password2").value;
+
+      if(!name || !email || !password){
+        errorEl.textContent = "Please fill in your name, email and password.";
+        return;
+      }
+      if(password.length < 6){
+        errorEl.textContent = "Password should be at least 6 characters.";
+        return;
+      }
+      if(password !== password2){
+        errorEl.textContent = "Passwords do not match.";
+        return;
+      }
+
+      const result = Store.signup({ name, email, password, branch, gradYear, targetRole });
+      if(result.ok){
+        Store.login(email, password);
+        window.location.href = "dashboard.html";
+      }else{
+        errorEl.textContent = result.error;
+      }
+    });
+  </script>
+</body>
+</html>

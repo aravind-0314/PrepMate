@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMate — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .gate-card{ width: 100%; max-width: 400px; }
+  .gate-brand{ text-align:center; margin-bottom: var(--s-6); }
+  .gate-brand .dot{ color: var(--amber); }
+  .gate-brand p{ margin: var(--s-2) auto 0; color: var(--text-faint); font-size: .85rem; max-width: 32ch; }
+  .gate-foot{ text-align:center; margin-top: var(--s-4); font-size: .88rem; color: var(--text-dim); }
+  .demo-note{
+    max-width: 400px;
+    margin: var(--s-5) auto 0;
+    font-size: .78rem;
+    color: var(--text-faint);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+  <main class="gate">
+    <div class="gate-card">
+      <div class="gate-brand">
+        <h1 style="margin-bottom:0;">Prep<span class="dot">Mate</span></h1>
+        <p>Track what you know, what you don't, and what's next before placement season.</p>
+      </div>
+
+      <form class="panel panel-amber" id="loginForm" novalidate>
+        <h3 style="margin-bottom: var(--s-4);">Sign in</h3>
+
+        <div class="field">
+          <label for="email">College email</label>
+          <input id="email" type="email" autocomplete="username" placeholder="you@college.edu" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-primary btn-block">Sign in</button>
+        <p class="error-msg" id="loginError" role="alert"></p>
+      </form>
+
+      <p class="gate-foot">New here? <a href="signup.html">Create an account</a></p>
+      <p class="demo-note">Runs entirely in your browser — accounts and progress are stored on this device only, in localStorage.</p>
+    </div>
+  </main>
+
+  <script src="js/store.js"></script>
+  <script>
+    // If already signed in, skip straight to the dashboard.
+    if(Store.currentUserEmail()){ window.location.href = "dashboard.html"; }
+
+    const form = document.getElementById("loginForm");
+    const errorEl = document.getElementById("loginError");
+
+    form.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      errorEl.textContent = "";
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const result = Store.login(email, password);
+      if(result.ok){
+        window.location.href = "dashboard.html";
+      }else{
+        errorEl.textContent = result.error;
+      }
+    });
+  </script>
+</body>
+</html>

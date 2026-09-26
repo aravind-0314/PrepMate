@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMate — Mock interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .track-tabs{ display:flex; gap: var(--s-2); margin-bottom: var(--s-5); }
+  .track-tabs button{ background: var(--panel); }
+  .track-tabs button.active{ background: var(--amber); color:#1A1200; border-color:var(--amber); }
+
+  .flash-card{
+    max-width: 620px;
+    min-height: 220px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .flash-q{ font-family: var(--f-display); font-size: 1.3rem; margin-bottom: var(--s-5); }
+  .rate-row{ display:flex; gap: var(--s-2); align-items:center; flex-wrap:wrap; }
+  .rate-btn{ width:42px; height:42px; padding:0; font-family:var(--f-mono); }
+  .rate-btn.picked{ background: var(--amber); border-color: var(--amber); color:#1A1200; }
+  .card-nav{ display:flex; justify-content:space-between; margin-top: var(--s-5); max-width:620px; }
+  .progress-text{ font-family: var(--f-mono); font-size:.8rem; color: var(--text-faint); margin-bottom: var(--s-3); }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="deck-nav">
+      <div class="brand">Prep<span class="dot">Mate</span></div>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="practice.html">Practice zone</a>
+        <a href="interview.html" class="active">Mock interview</a>
+        <a href="planner.html">Study planner</a>
+        <a href="report.html">Progress report</a>
+      </div>
+      <div class="nav-foot">
+        <span id="navUserName">—</span>
+        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
+      </div>
+    </nav>
+
+    <main class="deck-main">
+      <header class="deck-header">
+        <div>
+          <div class="kicker">Mock interview</div>
+          <h1>Answer out loud, then rate yourself</h1>
+        </div>
+      </header>
+      <p style="max-width:60ch;">Read each question, actually say your answer out loud or write it down, then rate how confident that answer was. Honest ratings make your progress report useful.</p>
+
+      <div class="track-tabs">
+        <button data-track="hr" class="active">HR &amp; behavioural</button>
+        <button data-track="technical">Technical</button>
+      </div>
+
+      <div class="progress-text" id="progressText"></div>
+
+      <div class="panel flash-card">
+        <div class="flash-q" id="flashQ"></div>
+        <div>
+          <p class="hint" style="margin-bottom:var(--s-2);">Rate your confidence in the answer you just gave:</p>
+          <div class="rate-row" id="rateRow"></div>
+        </div>
+      </div>
+
+      <div class="card-nav">
+        <button class="btn" id="prevBtn">← Previous</button>
+        <button class="btn btn-primary" id="nextBtn">Next →</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/content.js"></script>
+  <script>
+    Store.requireAuth();
+    const user = Store.currentUser();
+    document.getElementById("navUserName").textContent = user.name;
+    document.getElementById("logoutBtn").addEventListener("click", ()=>{ Store.logout(); window.location.href="index.html"; });
+
+    let track = "hr";
+    let idx = 0;
+
+    function currentQuestions(){ return INTERVIEW_QUESTIONS[track]; }
+
+    function render(){
+      const qs = currentQuestions();
+      const q = qs[idx];
+      document.getElementById("progressText").textContent = "QUESTION " + (idx+1) + " / " + qs.length;
+      document.getElementById("flashQ").textContent = q.q;
+
+      const data = Store.getData();
+      const ratingsForQ = data.interviewRatings[q.id] || [];
+      const lastRating = ratingsForQ.length ? ratingsForQ[ratingsForQ.length-1] : null;
+
+      const rateRow = document.getElementById("rateRow");
+      rateRow.innerHTML = "";
+      for(let i=1;i<=5;i++){
+        const b = document.createElement("button");
+        b.className = "rate-btn" + (i===lastRating ? " picked" : "");
+        b.textContent = i;
+        b.addEventListener("click", ()=>{
+          Store.rateInterviewQuestion(q.id, i);
+          render();
+        });
+        rateRow.appendChild(b);
+      }
+    }
+
+    document.querySelectorAll(".track-tabs button").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".track-tabs button").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        track = btn.dataset.track;
+        idx = 0;
+        render();
+      });
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", ()=>{
+      const qs = currentQuestions();
+      idx = (idx+1) % qs.length;
+      render();
+    });
+    document.getElementById("prevBtn").addEventListener("click", ()=>{
+      const qs = currentQuestions();
+      idx = (idx-1+qs.length) % qs.length;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

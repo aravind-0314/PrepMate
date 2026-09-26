@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMate — Study planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<style>
+  .track-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--s-3); }
+  .track-head .pct{ font-family:var(--f-mono); color:var(--text-faint); font-size:.85rem; }
+  .track-panel{ margin-bottom: var(--s-5); }
+  .target-row{ display:flex; gap: var(--s-3); align-items:flex-end; flex-wrap:wrap; }
+  .target-row .field{ margin-bottom:0; }
+  .add-task-row{ display:flex; gap: var(--s-2); margin-top: var(--s-3); }
+  .add-task-row input{ flex:1; }
+  .remove-x{ background:transparent; border:none; color:var(--text-faint); cursor:pointer; padding: 0 var(--s-2); }
+  .remove-x:hover{ color: var(--red); }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="deck-nav">
+      <div class="brand">Prep<span class="dot">Mate</span></div>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="practice.html">Practice zone</a>
+        <a href="interview.html">Mock interview</a>
+        <a href="planner.html" class="active">Study planner</a>
+        <a href="report.html">Progress report</a>
+      </div>
+      <div class="nav-foot">
+        <span id="navUserName">—</span>
+        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
+      </div>
+    </nav>
+
+    <main class="deck-main">
+      <header class="deck-header">
+        <div>
+          <div class="kicker">Study planner</div>
+          <h1>Your placement roadmap</h1>
+        </div>
+      </header>
+
+      <section class="panel" style="margin-bottom: var(--s-6); max-width:520px;">
+        <h3>Target date</h3>
+        <div class="target-row">
+          <div class="field">
+            <label for="targetDate">Placement drive / test date</label>
+            <input type="date" id="targetDate">
+          </div>
+          <button class="btn btn-primary" id="saveDateBtn">Save</button>
+        </div>
+        <p class="hint" id="countdownText" style="margin-top:var(--s-3);"></p>
+      </section>
+
+      <div id="tracksContainer"></div>
+
+      <section class="panel" style="margin-top: var(--s-6);">
+        <div class="track-head">
+          <h3 style="margin:0;">Readiness checklist</h3>
+          <span class="pct" id="checklistPct"></span>
+        </div>
+        <div id="checklistContainer"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/content.js"></script>
+  <script>
+    Store.requireAuth();
+    const user = Store.currentUser();
+    document.getElementById("navUserName").textContent = user.name;
+    document.getElementById("logoutBtn").addEventListener("click", ()=>{ Store.logout(); window.location.href="index.html"; });
+
+    function renderAll(){
+      const data = Store.getData();
+
+      // target date
+      document.getElementById("targetDate").value = data.targetDate || "";
+      if(data.targetDate){
+        const days = Math.ceil((new Date(data.targetDate) - new Date()) / 86400000);
+        document.getElementById("countdownText").textContent =
+          days >= 0 ? days + " day" + (days===1?"":"s") + " remaining until your target date." : "Your target date has passed — set a new one when the next drive is announced.";
+      }else{
+        document.getElementById("countdownText").textContent = "Set a date to see a countdown on your dashboard.";
+      }
+
+      // roadmap tracks
+      const tracksEl = document.getElementById("tracksContainer");
+      tracksEl.innerHTML = "";
+      PLANNER_TRACKS.forEach(track=>{
+        const done = track.tasks.filter(t=>data.planner[t.id]).length;
+        const pct = Math.round((done/track.tasks.length)*100);
+
+        const wrap = document.createElement("div");
+        wrap.className = "panel track-panel";
+        wrap.innerHTML = `
+          <div class="track-head">
+            <h3 style="margin:0;">${track.title}</h3>
+            <span class="pct">${done}/${track.tasks.length} · ${pct}%</span>
+          </div>
+          <div class="bar" style="margin-bottom:var(--s-3);"><span style="width:${pct}%"></span></div>
+        `;
+        const ul = document.createElement("div");
+        track.tasks.forEach(t=>{
+          const row = document.createElement("label");
+          row.className = "check-row" + (data.planner[t.id] ? " done" : "");
+          row.innerHTML = `<input type="checkbox" ${data.planner[t.id]?"checked":""} data-task="${t.id}"><span>${t.text}</span>`;
+          ul.appendChild(row);
+        });
+
+        // custom tasks belonging to this track (only shown under the interview track's "profile" is separate;
+        // we attach custom tasks to a dedicated section instead, appended after all tracks)
+        wrap.appendChild(ul);
+        tracksEl.appendChild(wrap);
+      });
+
+      // custom tasks panel
+      const customWrap = document.createElement("div");
+      customWrap.className = "panel track-panel";
+      const customDone = data.customTasks.filter(t=>data.planner[t.id]).length;
+      customWrap.innerHTML = `
+        <div class="track-head">
+          <h3 style="margin:0;">Your own tasks</h3>
+          <span class="pct">${data.customTasks.length ? customDone+"/"+data.customTasks.length : "none yet"}</span>
+        </div>
+      `;
+      const customList = document.createElement("div");
+      data.customTasks.forEach(t=>{
+        const row = document.createElement("div");
+        row.className = "check-row" + (data.planner[t.id] ? " done" : "");
+        row.innerHTML = `
+          <input type="checkbox" ${data.planner[t.id]?"checked":""} data-task="${t.id}" id="cb_${t.id}">
+          <label for="cb_${t.id}" style="flex:1;">${t.text}</label>
+          <button class="remove-x" data-remove="${t.id}" title="Remove task">✕</button>
+        `;
+        customList.appendChild(row);
+      });
+      customWrap.appendChild(customList);
+      const addRow = document.createElement("div");
+      addRow.className = "add-task-row";
+      addRow.innerHTML = `<input type="text" id="newTaskInput" placeholder="Add a task specific to your prep..."><button class="btn" id="addTaskBtn">Add</button>`;
+      customWrap.appendChild(addRow);
+      tracksEl.appendChild(customWrap);
+
+      // checklist
+      const checklistEl = document.getElementById("checklistContainer");
+      checklistEl.innerHTML = "";
+      CHECKLIST_ITEMS.forEach(item=>{
+        const row = document.createElement("label");
+        row.className = "check-row" + (data.checklist[item.id] ? " done" : "");
+        row.innerHTML = `<input type="checkbox" ${data.checklist[item.id]?"checked":""} data-check="${item.id}"><span>${item.text}</span>`;
+        checklistEl.appendChild(row);
+      });
+      const checklistDone = CHECKLIST_ITEMS.filter(i=>data.checklist[i.id]).length;
+      document.getElementById("checklistPct").textContent = checklistDone + "/" + CHECKLIST_ITEMS.length;
+
+      // wire up events (re-wired each render since we rebuild the DOM)
+      document.querySelectorAll("[data-task]").forEach(cb=>{
+        cb.addEventListener("change", ()=>{ Store.togglePlanner(cb.dataset.task); renderAll(); });
+      });
+      document.querySelectorAll("[data-check]").forEach(cb=>{
+        cb.addEventListener("change", ()=>{ Store.toggleChecklist(cb.dataset.check); renderAll(); });
+      });
+      document.querySelectorAll("[data-remove]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{ Store.removeCustomTask(btn.dataset.remove); renderAll(); });
+      });
+      const addBtn = document.getElementById("addTaskBtn");
+      if(addBtn){
+        addBtn.addEventListener("click", ()=>{
+          const input = document.getElementById("newTaskInput");
+          const text = input.value.trim();
+          if(text){ Store.addCustomTask(text); renderAll(); }
+        });
+      }
+    }
+
+    document.getElementById("saveDateBtn").addEventListener("click", ()=>{
+      const val = document.getElementById("targetDate").value;
+      Store.setTargetDate(val);
+      renderAll();
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
