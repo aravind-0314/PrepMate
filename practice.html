@@ -1,161 +1,1037 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrepMate — Practice zone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css">
-<style>
-  .cat-card{ cursor:pointer; transition: border-color .15s ease; }
-  .cat-card:hover{ border-color: var(--amber-dim); }
-  .cat-card .val{ font-family:var(--f-mono); font-size:1.3rem; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrepMate | Practice Zone</title>
 
-  #quizArea{ max-width: 640px; }
-  .q-progress{ font-family:var(--f-mono); font-size:.8rem; color:var(--text-faint); margin-bottom: var(--s-3); }
-  .option-btn{
-    display:block; width:100%; text-align:left;
-    margin-bottom: var(--s-2);
-    background: var(--ink-2);
-  }
-  .option-btn.correct{ border-color: var(--green); color: var(--green); }
-  .option-btn.wrong{ border-color: var(--red); color: var(--red); }
-  .option-btn:disabled{ cursor:default; }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
-  #resultArea .val{ font-family:var(--f-mono); font-size:2.5rem; font-weight:700; }
-  #hidden-panels{ display:none; }
-</style>
+  <link rel="stylesheet" href="css/base.css">
+
+  <style>
+    .practice-main {
+      width: 100%;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .practice-intro {
+      margin-bottom: 28px;
+    }
+
+    .practice-intro p {
+      margin-top: 10px;
+      color: var(--text-dim);
+    }
+
+    .section-title {
+      margin: 32px 0 18px;
+    }
+
+    .section-title h2 {
+      margin: 0 0 8px;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .career-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 22px;
+      padding: 26px;
+      border: 1px solid var(--amber-dim);
+      border-radius: 12px;
+      background: linear-gradient(
+        125deg,
+        #292e2b,
+        var(--panel)
+      );
+    }
+
+    .career-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .career-banner-icon {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 65px;
+      height: 65px;
+      border: 1px solid var(--amber-dim);
+      border-radius: 14px;
+      background: rgba(245, 166, 35, .1);
+      color: var(--amber);
+      font-size: 30px;
+    }
+
+    .career-banner h2 {
+      margin: 7px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .career-banner p {
+      margin: 0;
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .career-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .career-actions .btn {
+      text-align: center;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .cat-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 0;
+      padding: 24px;
+      cursor: pointer;
+      transition:
+        border-color .2s ease,
+        transform .2s ease;
+    }
+
+    .cat-card:hover {
+      border-color: var(--amber);
+      transform: translateY(-3px);
+    }
+
+    .cat-card h3 {
+      margin: 0;
+    }
+
+    .cat-card p {
+      margin: 0;
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .cat-card .val {
+      color: var(--amber);
+      font: 700 26px var(--f-mono);
+    }
+
+    .cat-card .card-action {
+      margin-top: auto;
+      color: var(--amber);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .career-quiz-card {
+      margin-top: 20px;
+      border-color: var(--amber-dim);
+    }
+
+    #quizArea,
+    #resultArea {
+      display: none;
+      max-width: 750px;
+      margin: 24px auto 0;
+    }
+
+    .quiz-panel {
+      padding: 28px;
+    }
+
+    .quiz-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .q-progress {
+      color: var(--text-faint);
+      font: 600 12px var(--f-mono);
+    }
+
+    .quiz-progress-track {
+      height: 7px;
+      margin-bottom: 28px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--ink);
+    }
+
+    #quizProgressFill {
+      width: 0;
+      height: 100%;
+      border-radius: 10px;
+      background: var(--amber);
+      transition: width .3s ease;
+    }
+
+    #qText {
+      margin-bottom: 25px;
+      font-size: clamp(19px, 2.5vw, 25px);
+      line-height: 1.5;
+    }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--ink-2);
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .15s ease;
+    }
+
+    .option-btn:not(:disabled):hover {
+      border-color: var(--amber);
+    }
+
+    .option-btn.correct {
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(52, 211, 153, .08);
+    }
+
+    .option-btn.wrong {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(239, 68, 68, .08);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .answer-feedback {
+      min-height: 24px;
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .answer-feedback.correct {
+      color: var(--green);
+    }
+
+    .answer-feedback.wrong {
+      color: var(--red);
+    }
+
+    .result-panel {
+      padding: 35px;
+      text-align: center;
+    }
+
+    .result-score {
+      margin: 20px 0;
+      color: var(--amber);
+      font: 700 48px var(--f-mono);
+    }
+
+    .result-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .back-btn {
+      border: 0;
+      background: transparent;
+      color: var(--text-dim);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      color: var(--amber);
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    .mobile-logout {
+      display: none;
+    }
+
+    @media (max-width: 820px) {
+      .deck-nav {
+        flex-wrap: wrap;
+      }
+
+      .mobile-menu {
+        display: block;
+        margin-left: auto;
+      }
+
+      .deck-nav .nav-links {
+        display: none;
+        width: 100%;
+        order: 3;
+      }
+
+      .deck-nav .nav-links.open {
+        display: flex;
+      }
+
+      .deck-nav .nav-foot {
+        display: none;
+      }
+
+      .deck-nav .nav-links.open .mobile-logout {
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
+        border: 0;
+        background: transparent;
+        color: var(--text-dim);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .career-banner-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .career-actions {
+        width: 100%;
+      }
+
+      .career-actions .btn {
+        flex: 1;
+      }
+
+      .quiz-panel,
+      .result-panel {
+        padding: 20px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cat-card,
+      .option-btn,
+      #quizProgressFill {
+        transition: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <div class="app-shell">
-    <nav class="deck-nav">
-      <div class="brand">Prep<span class="dot">Mate</span></div>
-      <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
-        <a href="practice.html" class="active">Practice zone</a>
-        <a href="interview.html">Mock interview</a>
-        <a href="planner.html">Study planner</a>
-        <a href="report.html">Progress report</a>
-      </div>
-      <div class="nav-foot">
-        <span id="navUserName">—</span>
-        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
-      </div>
-    </nav>
+<div class="app-shell">
 
-    <main class="deck-main">
-      <header class="deck-header">
-        <div>
-          <div class="kicker">Practice zone</div>
-          <h1>Choose a category</h1>
+  <nav class="deck-nav" aria-label="Main navigation">
+    <div class="brand">
+      Prep<span class="dot">Mate</span>
+    </div>
+
+    <button id="menuBtn"
+            class="mobile-menu"
+            type="button"
+            aria-controls="navLinks"
+            aria-expanded="false">
+      ☰ Menu
+    </button>
+
+    <div class="nav-links" id="navLinks">
+      <a href="dashboard.html">◈ Dashboard</a>
+      <a href="career.html">◎ Career Path</a>
+      <a href="practice.html" class="active">
+        ◇ Practice Zone
+      </a>
+      <a href="interview.html">◎ Mock Interview</a>
+      <a href="planner.html">▤ Study Planner</a>
+      <a href="report.html">▥ Progress Report</a>
+
+      <button id="mobileLogoutBtn"
+              class="mobile-logout"
+              type="button">
+        ↪ Sign out
+      </button>
+    </div>
+
+    <div class="nav-foot">
+      <span id="navUserName">Student</span>
+
+      <button id="logoutBtn"
+              class="btn-ghost btn-block"
+              type="button">
+        Sign out
+      </button>
+    </div>
+  </nav>
+
+  <main class="deck-main practice-main">
+
+    <header class="deck-header practice-intro">
+      <div>
+        <div class="kicker">
+          YOUR PLACEMENT PREPARATION
         </div>
-      </header>
 
-      <div class="grid grid-2" id="categoryGrid"></div>
+        <h1>Practice Zone</h1>
 
-      <section id="quizArea" style="display:none; margin-top: var(--s-6);">
-        <div class="panel">
-          <div class="q-progress" id="qProgress"></div>
-          <h3 id="qText"></h3>
-          <div id="qOptions"></div>
+        <p>
+          Strengthen your fundamentals and prepare
+          for your chosen career.
+        </p>
+      </div>
+    </header>
+
+    <!-- CATEGORY SELECTION -->
+    <div id="selectionArea">
+
+      <!-- CAREER BANNER -->
+      <section class="career-banner">
+        <div class="career-banner-content">
+
+          <div class="career-banner-icon"
+               id="careerIcon">
+            ◎
+          </div>
+
+          <div>
+            <span class="kicker">
+              PERSONALIZED PRACTICE
+            </span>
+
+            <h2 id="careerName">
+              Choose your career
+            </h2>
+
+            <p id="careerDescription">
+              Select a career to unlock
+              role-specific practice questions.
+            </p>
+          </div>
+        </div>
+
+        <div class="career-actions">
+          <a href="career.html"
+             class="btn"
+             id="changeCareerBtn">
+            Choose Career
+          </a>
+
+          <button id="startCareerBtn"
+                  class="btn btn-primary"
+                  type="button"
+                  disabled>
+            Start Career Quiz →
+          </button>
         </div>
       </section>
 
-      <section id="resultArea" class="panel" style="display:none; margin-top: var(--s-6); max-width:640px; text-align:center;">
-        <div class="kicker">Result</div>
-        <div class="val" id="resultScore"></div>
+      <!-- GENERAL CATEGORIES -->
+      <div class="section-title">
+        <span class="kicker">
+          PLACEMENT FUNDAMENTALS
+        </span>
+
+        <h2>General Practice</h2>
+
+        <p>
+          These categories are available
+          for every career path.
+        </p>
+      </div>
+
+      <div class="category-grid"
+           id="categoryGrid">
+      </div>
+
+      <!-- CAREER PRACTICE DETAILS -->
+      <section class="panel career-quiz-card"
+               id="careerQuizInfo">
+        <span class="kicker">
+          YOUR SPECIALIZATION
+        </span>
+
+        <h3 id="careerQuizTitle">
+          Career-Specific Practice
+        </h3>
+
+        <p id="careerQuizDescription">
+          Select your career path to unlock
+          specialized questions.
+        </p>
+
+        <div id="careerTopicTags"
+             style="display:flex; flex-wrap:wrap;
+                    gap:8px; margin-top:18px;">
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ACTIVE QUIZ -->
+    <section id="quizArea"
+             aria-label="Active quiz">
+
+      <div class="panel quiz-panel">
+
+        <div class="quiz-top">
+          <span class="q-progress"
+                id="qProgress">
+          </span>
+
+          <button id="exitQuizBtn"
+                  class="back-btn"
+                  type="button">
+            ← Exit Quiz
+          </button>
+        </div>
+
+        <div class="quiz-progress-track">
+          <div id="quizProgressFill"></div>
+        </div>
+
+        <h2 id="qText"></h2>
+
+        <div id="qOptions"></div>
+
+        <p id="answerFeedback"
+           class="answer-feedback"
+           aria-live="polite">
+        </p>
+
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="resultArea"
+             aria-label="Quiz result">
+
+      <div class="panel result-panel">
+
+        <span class="kicker">
+          QUIZ COMPLETED
+        </span>
+
+        <h2 id="resultTitle">
+          Your Result
+        </h2>
+
+        <div class="result-score"
+             id="resultScore">
+        </div>
+
+        <p id="resultPercentage"></p>
+
         <p id="resultMsg"></p>
-        <div style="display:flex; gap:var(--s-3); justify-content:center;">
-          <button class="btn btn-primary" id="retryBtn">Try again</button>
-          <a class="btn" href="practice.html">Back to categories</a>
+
+        <div class="result-actions">
+          <button id="retryBtn"
+                  class="btn btn-primary"
+                  type="button">
+            Try Again
+          </button>
+
+          <button id="backToCategoriesBtn"
+                  class="btn"
+                  type="button">
+            Back to Categories
+          </button>
+
+          <a href="report.html"
+             class="btn">
+            View Report →
+          </a>
         </div>
-      </section>
-    </main>
-  </div>
 
-  <script src="js/store.js"></script>
-  <script src="js/content.js"></script>
-  <script src="js/readiness.js"></script>
-  <script>
-    Store.requireAuth();
-    const user = Store.currentUser();
-    document.getElementById("navUserName").textContent = user.name;
-    document.getElementById("logoutBtn").addEventListener("click", ()=>{ Store.logout(); window.location.href="index.html"; });
+      </div>
+    </section>
 
-    const grid = document.getElementById("categoryGrid");
-    const data = Store.getData();
+  </main>
+</div>
 
-    Object.keys(QUIZ_BANK).forEach(cat=>{
-      const avg = Readiness.quizAverageByCategory(data, cat);
-      const el = document.createElement("div");
-      el.className = "panel cat-card";
-      el.innerHTML = `
-        <span class="tag tag-amber">${QUIZ_BANK[cat].length} questions</span>
-        <h3 style="margin-top:var(--s-3);">${QUIZ_CATEGORY_LABELS[cat]}</h3>
-        <p>${avg===null ? "Not attempted yet." : "Your average so far: "+avg+"%"}</p>
-        <span class="val">${avg===null ? "—" : avg+"%"}</span>
-      `;
-      el.addEventListener("click", ()=> startQuiz(cat));
-      grid.appendChild(el);
+<script src="js/store.js"></script>
+<script src="js/content.js"></script>
+<script src="js/career.js"></script>
+<script src="js/readiness.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  Store.requireAuth();
+
+  const user = Store.currentUser();
+  if (!user) return;
+
+  const $ = id => document.getElementById(id);
+
+  $("navUserName").textContent =
+    user.name || "Student";
+
+  function logout() {
+    Store.logout();
+    window.location.href = "index.html";
+  }
+
+  $("logoutBtn").addEventListener("click", logout);
+  $("mobileLogoutBtn").addEventListener("click", logout);
+
+  $("menuBtn").addEventListener("click", () => {
+    const open = $("navLinks").classList.toggle("open");
+
+    $("menuBtn").setAttribute(
+      "aria-expanded",
+      String(open)
+    );
+  });
+
+  // =====================================
+  // CAREER SELECTION
+  // =====================================
+
+  const careers =
+    typeof CAREER_PATHS !== "undefined"
+      ? CAREER_PATHS
+      : [];
+
+  const selectedCareer = careers.find(
+    career => career.id === user.careerId
+  );
+
+  const careerBank =
+    typeof CAREER_QUIZ_BANK !== "undefined"
+      ? CAREER_QUIZ_BANK
+      : {};
+
+  const careerQuestions = selectedCareer
+    ? careerBank[selectedCareer.id] || []
+    : [];
+
+  if (selectedCareer) {
+    $("careerIcon").textContent =
+      selectedCareer.icon || "◎";
+
+    $("careerName").textContent =
+      selectedCareer.name;
+
+    $("careerDescription").textContent =
+      selectedCareer.description;
+
+    $("changeCareerBtn").textContent =
+      "Change Career";
+
+    $("careerQuizTitle").textContent =
+      selectedCareer.name + " Practice";
+
+    $("careerQuizDescription").textContent =
+      careerQuestions.length
+        ? careerQuestions.length +
+          " specialized questions covering key skills."
+        : "Specialized questions for this career " +
+          "are not available yet.";
+
+    const tags = $("careerTopicTags");
+
+    (selectedCareer.skills || []).forEach(skill => {
+      const tag = document.createElement("span");
+
+      tag.className = "tag";
+      tag.textContent = skill;
+
+      tags.appendChild(tag);
     });
 
-    let current = { category:null, index:0, score:0, questions:[] };
+    if (careerQuestions.length) {
+      $("startCareerBtn").disabled = false;
 
-    function startQuiz(cat){
-      current = { category:cat, index:0, score:0, questions: QUIZ_BANK[cat] };
-      grid.style.display = "none";
-      document.getElementById("resultArea").style.display = "none";
-      document.getElementById("quizArea").style.display = "block";
-      renderQuestion();
+      $("startCareerBtn").textContent =
+        "Start Career Quiz →";
+    } else {
+      $("startCareerBtn").textContent =
+        "Coming Soon";
     }
+  }
 
-    function renderQuestion(){
-      const q = current.questions[current.index];
-      document.getElementById("qProgress").textContent =
-        QUIZ_CATEGORY_LABELS[current.category].toUpperCase() + " — QUESTION " + (current.index+1) + " / " + current.questions.length;
-      document.getElementById("qText").textContent = q.q;
-      const optsEl = document.getElementById("qOptions");
-      optsEl.innerHTML = "";
-      q.options.forEach((opt, i)=>{
-        const b = document.createElement("button");
-        b.className = "option-btn";
-        b.textContent = opt;
-        b.addEventListener("click", ()=> selectAnswer(i));
-        optsEl.appendChild(b);
+  // =====================================
+  // GENERAL QUIZ CATEGORIES
+  // =====================================
+
+  const grid = $("categoryGrid");
+
+  const categoryDescriptions = {
+    aptitude:
+      "Practice percentages, ratios, averages, " +
+      "speed, time and logical calculations.",
+
+    technical:
+      "Revise computer science fundamentals, " +
+      "DBMS, operating systems and networking.",
+
+    coding_logic:
+      "Build programming logic and improve " +
+      "your problem-solving skills.",
+
+    verbal:
+      "Improve grammar, vocabulary and " +
+      "professional communication."
+  };
+
+  Object.keys(QUIZ_BANK).forEach(category => {
+    const data = Store.getData();
+
+    const average =
+      Readiness.quizAverageByCategory(
+        data,
+        category
+      );
+
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "panel cat-card";
+
+    const count = document.createElement("span");
+    count.className = "tag tag-amber";
+    count.textContent =
+      QUIZ_BANK[category].length + " questions";
+
+    const title = document.createElement("h3");
+    title.textContent =
+      QUIZ_CATEGORY_LABELS[category];
+
+    const description = document.createElement("p");
+    description.textContent =
+      categoryDescriptions[category] ||
+      "Practice your placement skills.";
+
+    const result = document.createElement("span");
+    result.className = "val";
+
+    result.textContent =
+      average === null
+        ? "—"
+        : average + "%";
+
+    const action = document.createElement("span");
+    action.className = "card-action";
+    action.textContent =
+      average === null
+        ? "Start Practice →"
+        : "Practice Again →";
+
+    card.append(
+      count,
+      title,
+      description,
+      result,
+      action
+    );
+
+    card.addEventListener("click", () => {
+      startQuiz(
+        category,
+        QUIZ_BANK[category],
+        QUIZ_CATEGORY_LABELS[category],
+        false
+      );
+    });
+
+    grid.appendChild(card);
+  });
+
+  // =====================================
+  // QUIZ ENGINE
+  // =====================================
+
+  let current = {
+    category: null,
+    title: "",
+    index: 0,
+    score: 0,
+    questions: [],
+    isCareerQuiz: false,
+    answering: false
+  };
+
+  let nextQuestionTimer = null;
+
+  function showArea(areaId) {
+    ["selectionArea", "quizArea", "resultArea"]
+      .forEach(id => {
+        $(id).style.display =
+          id === areaId ? "block" : "none";
       });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function startQuiz(
+    category,
+    questions,
+    title,
+    isCareerQuiz
+  ) {
+    if (!questions || !questions.length) {
+      return;
     }
 
-    function selectAnswer(i){
-      const q = current.questions[current.index];
-      const buttons = document.querySelectorAll("#qOptions .option-btn");
-      buttons.forEach(b=>b.disabled = true);
-      buttons[q.a].classList.add("correct");
-      if(i !== q.a){ buttons[i].classList.add("wrong"); } else { current.score++; }
+    clearTimeout(nextQuestionTimer);
 
-      setTimeout(()=>{
-        current.index++;
-        if(current.index < current.questions.length){
-          renderQuestion();
-        }else{
-          finishQuiz();
-        }
-      }, 700);
+    current = {
+      category,
+      title,
+      index: 0,
+      score: 0,
+      questions: [...questions],
+      isCareerQuiz,
+      answering: false
+    };
+
+    showArea("quizArea");
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const question =
+      current.questions[current.index];
+
+    if (!question) return;
+
+    current.answering = false;
+
+    $("qProgress").textContent =
+      current.title.toUpperCase() +
+      " — QUESTION " +
+      (current.index + 1) +
+      " / " +
+      current.questions.length;
+
+    $("quizProgressFill").style.width =
+      (current.index / current.questions.length) *
+      100 + "%";
+
+    $("qText").textContent = question.q;
+
+    $("answerFeedback").textContent = "";
+    $("answerFeedback").className =
+      "answer-feedback";
+
+    const options = $("qOptions");
+    options.replaceChildren();
+
+    question.options.forEach((option, index) => {
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "option-btn";
+      button.textContent = option;
+
+      button.addEventListener("click", () => {
+        selectAnswer(index);
+      });
+
+      options.appendChild(button);
+    });
+  }
+
+  function selectAnswer(index) {
+    if (current.answering) return;
+
+    current.answering = true;
+
+    const question =
+      current.questions[current.index];
+
+    const buttons = [
+      ...$("qOptions").querySelectorAll(
+        ".option-btn"
+      )
+    ];
+
+    buttons.forEach(button => {
+      button.disabled = true;
+    });
+
+    buttons[question.a].classList.add("correct");
+
+    if (index === question.a) {
+      current.score++;
+
+      $("answerFeedback").textContent =
+        "Correct answer!";
+
+      $("answerFeedback").classList.add(
+        "correct"
+      );
+    } else {
+      buttons[index].classList.add("wrong");
+
+      $("answerFeedback").textContent =
+        "Correct answer: " +
+        question.options[question.a];
+
+      $("answerFeedback").classList.add(
+        "wrong"
+      );
     }
 
-    function finishQuiz(){
-      document.getElementById("quizArea").style.display = "none";
-      const pct = Math.round((current.score / current.questions.length) * 100);
-      Store.recordQuiz(current.category, current.score, current.questions.length);
-      document.getElementById("resultArea").style.display = "block";
-      document.getElementById("resultScore").textContent = current.score + " / " + current.questions.length;
-      let msg = pct >= 75 ? "Strong round — keep this pace up." :
-                pct >= 45 ? "Decent, but there's clear room to tighten this up." :
-                "This category needs focused revision before your next attempt.";
-      document.getElementById("resultMsg").textContent = msg + " Saved to your progress report.";
+    nextQuestionTimer = setTimeout(() => {
+      current.index++;
+
+      if (
+        current.index <
+        current.questions.length
+      ) {
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }, 1100);
+  }
+
+  function finishQuiz() {
+    clearTimeout(nextQuestionTimer);
+
+    const total = current.questions.length;
+
+    const percentage = Math.round(
+      current.score / total * 100
+    );
+
+    // Career questions are recorded under technical
+    // to remain compatible with the current Readiness
+    // and Progress Report implementations.
+    const savedCategory = current.isCareerQuiz
+      ? "technical"
+      : current.category;
+
+    Store.recordQuiz(
+      savedCategory,
+      current.score,
+      total
+    );
+
+    $("resultTitle").textContent =
+      current.title + " Result";
+
+    $("resultScore").textContent =
+      current.score + " / " + total;
+
+    $("resultPercentage").textContent =
+      percentage + "% correct";
+
+    let message;
+
+    if (percentage >= 75) {
+      message =
+        "Strong round! Keep practicing to " +
+        "maintain your progress.";
+    } else if (percentage >= 45) {
+      message =
+        "Good progress. Review the topics " +
+        "you missed and try again.";
+    } else {
+      message =
+        "Focus on the fundamentals and " +
+        "retry this quiz after revision.";
     }
 
-    document.getElementById("retryBtn").addEventListener("click", ()=> startQuiz(current.category));
-  </script>
+    $("resultMsg").textContent =
+      message +
+      " Your score has been saved to " +
+      "your progress report.";
+
+    showArea("resultArea");
+  }
+
+  // =====================================
+  // BUTTON EVENTS
+  // =====================================
+
+  $("startCareerBtn").addEventListener(
+    "click",
+    () => {
+      if (!selectedCareer) return;
+
+      startQuiz(
+        "technical",
+        careerQuestions,
+        selectedCareer.name,
+        true
+      );
+    }
+  );
+
+  $("retryBtn").addEventListener(
+    "click",
+    () => {
+      startQuiz(
+        current.category,
+        current.questions,
+        current.title,
+        current.isCareerQuiz
+      );
+    }
+  );
+
+  $("exitQuizBtn").addEventListener(
+    "click",
+    () => {
+      clearTimeout(nextQuestionTimer);
+      showArea("selectionArea");
+    }
+  );
+
+  $("backToCategoriesBtn").addEventListener(
+    "click",
+    () => {
+      showArea("selectionArea");
+    }
+  );
+
+})();
+</script>
+
 </body>
 </html>
