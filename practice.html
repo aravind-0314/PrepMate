@@ -1,161 +1,2616 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrepMate — Practice zone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css">
-<style>
-  .cat-card{ cursor:pointer; transition: border-color .15s ease; }
-  .cat-card:hover{ border-color: var(--amber-dim); }
-  .cat-card .val{ font-family:var(--f-mono); font-size:1.3rem; }
 
-  #quizArea{ max-width: 640px; }
-  .q-progress{ font-family:var(--f-mono); font-size:.8rem; color:var(--text-faint); margin-bottom: var(--s-3); }
-  .option-btn{
-    display:block; width:100%; text-align:left;
-    margin-bottom: var(--s-2);
-    background: var(--ink-2);
-  }
-  .option-btn.correct{ border-color: var(--green); color: var(--green); }
-  .option-btn.wrong{ border-color: var(--red); color: var(--red); }
-  .option-btn:disabled{ cursor:default; }
+  <meta charset="UTF-8">
 
-  #resultArea .val{ font-family:var(--f-mono); font-size:2.5rem; font-weight:700; }
-  #hidden-panels{ display:none; }
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PrepMate - Practice Zone</title>
+
+  <link rel="stylesheet" href="css/base.css">
+
+  <style>
+
+    /* =========================================================
+       BASIC
+       ========================================================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0d1721;
+      color: #e8edf3;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+
+    /* =========================================================
+       MAIN LAYOUT
+       ========================================================= */
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+    }
+
+
+    /* =========================================================
+       SIDEBAR
+       ========================================================= */
+
+    .sidebar {
+      width: 230px;
+      min-height: 100vh;
+
+      background: #101c27;
+
+      border-right: 1px solid #253442;
+
+      padding: 28px 16px;
+
+      position: fixed;
+
+      left: 0;
+      top: 0;
+      bottom: 0;
+    }
+
+
+    /* LOGO */
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+
+      margin-bottom: 38px;
+
+      padding-left: 14px;
+    }
+
+    .logo-white {
+      color: #f2f5f8;
+    }
+
+    .logo-orange {
+      color: #f5a623;
+    }
+
+
+    /* NAVIGATION */
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav a {
+      text-decoration: none;
+
+      color: #91a0af;
+
+      padding: 12px 14px;
+
+      border-radius: 5px;
+
+      font-size: 14px;
+
+      transition: 0.2s;
+    }
+
+    .nav a:hover {
+      background: #172532;
+      color: #f2f5f8;
+    }
+
+    .nav a.active {
+      color: #f2f5f8;
+
+      background: #172532;
+
+      border-left: 2px solid #f5a623;
+    }
+
+
+    /* =========================================================
+       MAIN CONTENT
+       ========================================================= */
+
+    .main {
+      margin-left: 230px;
+
+      width: calc(100% - 230px);
+
+      min-height: 100vh;
+
+      padding: 40px 34px;
+    }
+
+
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .small-title {
+      color: #778797;
+
+      font-size: 13px;
+
+      margin-bottom: 8px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+
+      font-size: 34px;
+
+      color: #f3f6f9;
+    }
+
+    .page-header p {
+      color: #8796a5;
+
+      margin-top: 10px;
+
+      line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       CATEGORY SECTION
+       ========================================================= */
+
+    .category-section {
+      background: #16232f;
+
+      border: 1px solid #263746;
+
+      border-radius: 8px;
+
+      padding: 25px;
+
+      margin-bottom: 24px;
+    }
+
+    .section-label {
+      color: #f5a623;
+
+      border: 1px solid #75601f;
+
+      padding: 5px 9px;
+
+      display: inline-block;
+
+      border-radius: 3px;
+
+      font-size: 12px;
+
+      font-weight: bold;
+
+      margin-bottom: 12px;
+    }
+
+    .category-section h2 {
+      margin: 0 0 8px;
+
+      font-size: 21px;
+    }
+
+    .category-section p {
+      color: #8998a7;
+
+      margin-top: 0;
+
+      line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       CATEGORY CARDS
+       ========================================================= */
+
+    .category-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 14px;
+
+      margin-top: 22px;
+    }
+
+    .category-card {
+      background: #111e29;
+
+      border: 1px solid #2a3a49;
+
+      border-radius: 7px;
+
+      padding: 20px;
+
+      text-align: left;
+
+      color: #edf2f6;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+
+      min-height: 130px;
+    }
+
+    .category-card:hover {
+      border-color: #f5a623;
+
+      transform: translateY(-2px);
+    }
+
+    .category-card .icon {
+      font-size: 25px;
+
+      margin-bottom: 12px;
+    }
+
+    .category-card h3 {
+      margin: 0 0 8px;
+
+      font-size: 16px;
+    }
+
+    .category-card p {
+      margin: 0;
+
+      font-size: 12px;
+
+      color: #788897;
+    }
+
+
+    /* =========================================================
+       ADAPTIVE INFO
+       ========================================================= */
+
+    .adaptive-box {
+      background: #111e29;
+
+      border: 1px solid #293947;
+
+      border-radius: 7px;
+
+      padding: 18px;
+
+      margin-top: 20px;
+    }
+
+    .adaptive-box strong {
+      color: #f5a623;
+    }
+
+    .adaptive-flow {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      margin-top: 14px;
+
+      flex-wrap: wrap;
+    }
+
+    .level {
+      padding: 7px 13px;
+
+      border-radius: 4px;
+
+      font-size: 12px;
+
+      font-weight: bold;
+    }
+
+    .level.easy {
+      background: #183a2a;
+      color: #62d391;
+    }
+
+    .level.medium {
+      background: #403617;
+      color: #f2c85b;
+    }
+
+    .level.hard {
+      background: #421e24;
+      color: #f07883;
+    }
+
+    .arrow {
+      color: #6f7f8e;
+    }
+
+
+    /* =========================================================
+       QUIZ AREA
+       ========================================================= */
+
+    .quiz-area {
+      display: none;
+    }
+
+
+    /* =========================================================
+       QUIZ TOP
+       ========================================================= */
+
+    .quiz-top {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 20px;
+
+      gap: 15px;
+    }
+
+    .quiz-category {
+      color: #f5a623;
+
+      font-size: 13px;
+
+      font-weight: bold;
+    }
+
+    .timer {
+      padding: 9px 15px;
+
+      border-radius: 5px;
+
+      background: #172735;
+
+      border: 1px solid #2c3c4a;
+
+      color: #e9eef3;
+
+      font-weight: bold;
+    }
+
+    .timer.warning {
+      background: #402026;
+
+      border-color: #82404a;
+
+      color: #ff7c87;
+    }
+
+
+    /* =========================================================
+       PROGRESS
+       ========================================================= */
+
+    .progress-container {
+      margin-bottom: 20px;
+    }
+
+    .progress-info {
+      display: flex;
+
+      justify-content: space-between;
+
+      color: #7f8e9c;
+
+      font-size: 12px;
+
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 5px;
+
+      background: #243441;
+
+      border-radius: 10px;
+
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+
+      background: #f5a623;
+
+      width: 0%;
+
+      transition: width 0.3s;
+    }
+
+
+    /* =========================================================
+       QUESTION CARD
+       ========================================================= */
+
+    .question-card {
+      background: #16232f;
+
+      border: 1px solid #263746;
+
+      border-radius: 8px;
+
+      padding: 28px;
+
+      margin-bottom: 20px;
+    }
+
+
+    /* DIFFICULTY */
+
+    .difficulty {
+      display: inline-block;
+
+      padding: 5px 10px;
+
+      border-radius: 3px;
+
+      font-size: 11px;
+
+      font-weight: bold;
+
+      margin-bottom: 18px;
+    }
+
+    .difficulty.easy {
+      background: #183a2a;
+
+      color: #62d391;
+    }
+
+    .difficulty.medium {
+      background: #403617;
+
+      color: #f2c85b;
+    }
+
+    .difficulty.hard {
+      background: #421e24;
+
+      color: #f07883;
+    }
+
+
+    /* QUESTION */
+
+    .question-text {
+      font-size: 21px;
+
+      line-height: 1.6;
+
+      font-weight: 600;
+
+      color: #f1f4f7;
+
+      margin-bottom: 24px;
+    }
+
+
+    /* =========================================================
+       OPTIONS
+       ========================================================= */
+
+    .options {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 11px;
+    }
+
+    .option {
+      width: 100%;
+
+      text-align: left;
+
+      padding: 15px 17px;
+
+      background: #101c27;
+
+      border: 1px solid #2b3c4a;
+
+      color: #dce3e9;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      transition: 0.2s;
+    }
+
+    .option:hover {
+      border-color: #f5a623;
+
+      background: #172631;
+    }
+
+    .option.correct {
+      border-color: #43c779;
+
+      background: #173427;
+
+      color: #7ce4a4;
+    }
+
+    .option.wrong {
+      border-color: #d95763;
+
+      background: #351d22;
+
+      color: #ff8992;
+    }
+
+    .option:disabled {
+      cursor: default;
+    }
+
+
+    /* =========================================================
+       FEEDBACK
+       ========================================================= */
+
+    .feedback {
+      display: none;
+
+      margin-top: 18px;
+
+      padding: 13px 15px;
+
+      border-radius: 5px;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    .feedback.correct {
+      display: block;
+
+      background: #173427;
+
+      border: 1px solid #2d7049;
+
+      color: #77dfa0;
+    }
+
+    .feedback.wrong {
+      display: block;
+
+      background: #351d22;
+
+      border: 1px solid #74323a;
+
+      color: #ff8b94;
+    }
+
+
+    /* =========================================================
+       NEXT BUTTON
+       ========================================================= */
+
+    .next-row {
+      display: flex;
+
+      justify-content: flex-end;
+
+      margin-top: 18px;
+    }
+
+    .next-btn {
+      display: none;
+
+      border: none;
+
+      background: #f5a623;
+
+      color: #111923;
+
+      padding: 12px 20px;
+
+      border-radius: 5px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .next-btn:hover {
+      background: #ffb83e;
+    }
+
+
+    /* =========================================================
+       QUIZ STATS
+       ========================================================= */
+
+    .quiz-stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 14px;
+
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #16232f;
+
+      border: 1px solid #263746;
+
+      border-radius: 7px;
+
+      padding: 18px;
+    }
+
+    .stat-card .number {
+      font-size: 25px;
+
+      font-weight: bold;
+
+      color: #f1f4f7;
+    }
+
+    .stat-card .label {
+      font-size: 11px;
+
+      color: #788896;
+
+      margin-top: 5px;
+    }
+
+
+    /* =========================================================
+       RESULT
+       ========================================================= */
+
+    .result-area {
+      display: none;
+    }
+
+    .result-card {
+      background: #16232f;
+
+      border: 1px solid #263746;
+
+      border-radius: 8px;
+
+      padding: 35px;
+
+      text-align: center;
+    }
+
+    .result-label {
+      color: #f5a623;
+
+      font-size: 12px;
+
+      font-weight: bold;
+
+      letter-spacing: 1px;
+    }
+
+    .result-card h2 {
+      margin: 10px 0;
+
+      font-size: 28px;
+    }
+
+    .score-circle {
+      width: 130px;
+
+      height: 130px;
+
+      border-radius: 50%;
+
+      border: 7px solid #f5a623;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      margin: 25px auto;
+
+      font-size: 30px;
+
+      font-weight: bold;
+    }
+
+    .result-description {
+      color: #8796a5;
+
+      margin-bottom: 25px;
+    }
+
+
+    /* RESULT STATS */
+
+    .result-stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 14px;
+
+      margin-bottom: 25px;
+    }
+
+    .result-stat {
+      background: #111e29;
+
+      border: 1px solid #293947;
+
+      border-radius: 6px;
+
+      padding: 17px;
+    }
+
+    .result-stat strong {
+      display: block;
+
+      font-size: 23px;
+
+      margin-bottom: 5px;
+    }
+
+    .result-stat span {
+      color: #788896;
+
+      font-size: 11px;
+    }
+
+
+    /* DIFFICULTY RESULT */
+
+    .difficulty-result {
+      text-align: left;
+
+      background: #111e29;
+
+      border: 1px solid #293947;
+
+      border-radius: 6px;
+
+      padding: 20px;
+
+      margin-bottom: 25px;
+    }
+
+    .difficulty-result h3 {
+      margin-top: 0;
+
+      font-size: 15px;
+    }
+
+    .difficulty-line {
+      display: flex;
+
+      justify-content: space-between;
+
+      padding: 9px 0;
+
+      border-bottom: 1px solid #253542;
+
+      font-size: 13px;
+    }
+
+    .difficulty-line:last-child {
+      border-bottom: none;
+    }
+
+    .difficulty-name {
+      color: #8998a6;
+    }
+
+
+    /* RESULT BUTTONS */
+
+    .result-buttons {
+      display: flex;
+
+      justify-content: center;
+
+      gap: 12px;
+
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      padding: 12px 20px;
+
+      border-radius: 5px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      text-decoration: none;
+
+      display: inline-block;
+    }
+
+    .primary-btn {
+      background: #f5a623;
+
+      color: #111923;
+
+      border: none;
+    }
+
+    .secondary-btn {
+      background: transparent;
+
+      color: #d9e0e6;
+
+      border: 1px solid #3a4b59;
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+      .sidebar {
+        width: 190px;
+      }
+
+      .main {
+        margin-left: 190px;
+
+        width: calc(100% - 190px);
+
+        padding: 28px 22px;
+      }
+
+      .category-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+      .sidebar {
+        position: relative;
+
+        width: 100%;
+
+        min-height: auto;
+
+        border-right: none;
+
+        border-bottom: 1px solid #253442;
+
+        padding: 18px;
+      }
+
+      .logo {
+        margin-bottom: 15px;
+      }
+
+      .nav {
+        flex-direction: row;
+
+        overflow-x: auto;
+      }
+
+      .nav a {
+        white-space: nowrap;
+      }
+
+      .app {
+        display: block;
+      }
+
+      .main {
+        margin-left: 0;
+
+        width: 100%;
+
+        padding: 25px 16px;
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quiz-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .result-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header h1 {
+        font-size: 28px;
+      }
+
+      .question-text {
+        font-size: 18px;
+      }
+
+    }
+
+  </style>
+
 </head>
+
+
 <body>
-  <div class="app-shell">
-    <nav class="deck-nav">
-      <div class="brand">Prep<span class="dot">Mate</span></div>
-      <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
-        <a href="practice.html" class="active">Practice zone</a>
-        <a href="interview.html">Mock interview</a>
-        <a href="planner.html">Study planner</a>
-        <a href="report.html">Progress report</a>
-      </div>
-      <div class="nav-foot">
-        <span id="navUserName">—</span>
-        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
-      </div>
+
+
+<div class="app">
+
+
+  <!-- ============================================================
+       SIDEBAR
+       ============================================================ -->
+
+  <aside class="sidebar">
+
+    <div class="logo">
+
+      <span class="logo-white">Prep</span>
+      <span class="logo-orange">Mate</span>
+
+    </div>
+
+
+    <nav class="nav">
+
+      <a href="dashboard.html">
+        Dashboard
+      </a>
+
+      <a href="practice.html" class="active">
+        Practice zone
+      </a>
+
+      <a href="interview.html">
+        Mock interview
+      </a>
+
+      <a href="planner.html">
+        Study planner
+      </a>
+
+      <a href="report.html">
+        Progress report
+      </a>
+
     </nav>
 
-    <main class="deck-main">
-      <header class="deck-header">
+  </aside>
+
+
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+
+  <main class="main">
+
+
+    <!-- ==========================================================
+         PAGE HEADER
+         ========================================================== -->
+
+    <div class="page-header">
+
+      <div class="small-title">
+        Assessment intelligence
+      </div>
+
+      <h1>
+        FireDrill
+      </h1>
+
+      <p>
+        Practice timed questions and improve your performance
+        with adaptive difficulty.
+      </p>
+
+    </div>
+
+
+
+    <!-- ==========================================================
+         CATEGORY PAGE
+         ========================================================== -->
+
+    <section
+      class="category-area"
+      id="categoryArea"
+    >
+
+
+      <div class="category-section">
+
+        <div class="section-label">
+          PRACTICE
+        </div>
+
+        <h2>
+          Choose your FireDrill
+        </h2>
+
+        <p>
+          Select a topic and start your assessment.
+          The difficulty changes based on your answers.
+        </p>
+
+
+        <!-- CATEGORY CARDS -->
+
+        <div class="category-grid">
+
+
+          <button
+            class="category-card"
+            onclick="startQuiz('aptitude')"
+          >
+
+            <div class="icon">
+              📊
+            </div>
+
+            <h3>
+              Aptitude
+            </h3>
+
+            <p>
+              Numbers, ratios, averages and reasoning.
+            </p>
+
+          </button>
+
+
+
+          <button
+            class="category-card"
+            onclick="startQuiz('technical')"
+          >
+
+            <div class="icon">
+              💻
+            </div>
+
+            <h3>
+              Technical
+            </h3>
+
+            <p>
+              CS fundamentals, DBMS, OS, networks and DSA.
+            </p>
+
+          </button>
+
+
+
+          <button
+            class="category-card"
+            onclick="startQuiz('coding_logic')"
+          >
+
+            <div class="icon">
+              🧩
+            </div>
+
+            <h3>
+              Coding Logic
+            </h3>
+
+            <p>
+              Programming logic and problem solving.
+            </p>
+
+          </button>
+
+
+
+          <button
+            class="category-card"
+            onclick="startQuiz('verbal')"
+          >
+
+            <div class="icon">
+              📝
+            </div>
+
+            <h3>
+              Verbal
+            </h3>
+
+            <p>
+              English, vocabulary and communication.
+            </p>
+
+          </button>
+
+
+        </div>
+
+
+        <!-- ADAPTIVE INFORMATION -->
+
+        <div class="adaptive-box">
+
+          <strong>
+            Adaptive FireDrill
+          </strong>
+
+          <p>
+            Your next question becomes harder when you answer
+            correctly and easier when you answer incorrectly.
+          </p>
+
+
+          <div class="adaptive-flow">
+
+            <span class="level easy">
+              EASY
+            </span>
+
+            <span class="arrow">
+              →
+            </span>
+
+            <span class="level medium">
+              MEDIUM
+            </span>
+
+            <span class="arrow">
+              →
+            </span>
+
+            <span class="level hard">
+              HARD
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         QUIZ AREA
+         ========================================================== -->
+
+    <section
+      class="quiz-area"
+      id="quizArea"
+    >
+
+
+      <!-- TOP -->
+
+      <div class="quiz-top">
+
         <div>
-          <div class="kicker">Practice zone</div>
-          <h1>Choose a category</h1>
+
+          <div class="small-title">
+            FIRE DRILL
+          </div>
+
+          <div
+            class="quiz-category"
+            id="quizCategory"
+          >
+            Technical
+          </div>
+
         </div>
-      </header>
 
-      <div class="grid grid-2" id="categoryGrid"></div>
 
-      <section id="quizArea" style="display:none; margin-top: var(--s-6);">
-        <div class="panel">
-          <div class="q-progress" id="qProgress"></div>
-          <h3 id="qText"></h3>
-          <div id="qOptions"></div>
+        <div
+          class="timer"
+          id="timer"
+        >
+          ⏱ 30s
         </div>
-      </section>
 
-      <section id="resultArea" class="panel" style="display:none; margin-top: var(--s-6); max-width:640px; text-align:center;">
-        <div class="kicker">Result</div>
-        <div class="val" id="resultScore"></div>
-        <p id="resultMsg"></p>
-        <div style="display:flex; gap:var(--s-3); justify-content:center;">
-          <button class="btn btn-primary" id="retryBtn">Try again</button>
-          <a class="btn" href="practice.html">Back to categories</a>
+      </div>
+
+
+
+      <!-- PROGRESS -->
+
+      <div class="progress-container">
+
+        <div class="progress-info">
+
+          <span id="progressText">
+            Question 1 of 10
+          </span>
+
+          <span id="scoreText">
+            Score: 0
+          </span>
+
         </div>
-      </section>
-    </main>
-  </div>
 
-  <script src="js/store.js"></script>
-  <script src="js/content.js"></script>
-  <script src="js/readiness.js"></script>
-  <script>
-    Store.requireAuth();
-    const user = Store.currentUser();
-    document.getElementById("navUserName").textContent = user.name;
-    document.getElementById("logoutBtn").addEventListener("click", ()=>{ Store.logout(); window.location.href="index.html"; });
 
-    const grid = document.getElementById("categoryGrid");
-    const data = Store.getData();
+        <div class="progress-bar">
 
-    Object.keys(QUIZ_BANK).forEach(cat=>{
-      const avg = Readiness.quizAverageByCategory(data, cat);
-      const el = document.createElement("div");
-      el.className = "panel cat-card";
-      el.innerHTML = `
-        <span class="tag tag-amber">${QUIZ_BANK[cat].length} questions</span>
-        <h3 style="margin-top:var(--s-3);">${QUIZ_CATEGORY_LABELS[cat]}</h3>
-        <p>${avg===null ? "Not attempted yet." : "Your average so far: "+avg+"%"}</p>
-        <span class="val">${avg===null ? "—" : avg+"%"}</span>
-      `;
-      el.addEventListener("click", ()=> startQuiz(cat));
-      grid.appendChild(el);
+          <div
+            class="progress-fill"
+            id="progressFill"
+          >
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- SMALL STATS -->
+
+      <div class="quiz-stats">
+
+        <div class="stat-card">
+
+          <div
+            class="number"
+            id="currentQuestionNumber"
+          >
+            1
+          </div>
+
+          <div class="label">
+            CURRENT QUESTION
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div
+            class="number"
+            id="currentDifficultyText"
+          >
+            EASY
+          </div>
+
+          <div class="label">
+            DIFFICULTY
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div
+            class="number"
+            id="correctCount"
+          >
+            0
+          </div>
+
+          <div class="label">
+            CORRECT
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- QUESTION -->
+
+      <div class="question-card">
+
+
+        <div
+          class="difficulty easy"
+          id="difficulty"
+        >
+          EASY
+        </div>
+
+
+        <div
+          class="question-text"
+          id="question"
+        >
+          Question will appear here.
+        </div>
+
+
+        <div
+          class="options"
+          id="options"
+        >
+        </div>
+
+
+        <div
+          class="feedback"
+          id="feedback"
+        >
+        </div>
+
+
+        <div class="next-row">
+
+          <button
+            class="next-btn"
+            id="nextBtn"
+            onclick="nextQuestion()"
+          >
+            Next Question →
+          </button>
+
+        </div>
+
+      </div>
+
+
+    </section>
+
+
+
+    <!-- ==========================================================
+         RESULT AREA
+         ========================================================== -->
+
+    <section
+      class="result-area"
+      id="resultArea"
+    >
+
+
+      <div class="result-card">
+
+
+        <div class="result-label">
+          FIRE DRILL COMPLETE
+        </div>
+
+
+        <h2>
+          Assessment finished
+        </h2>
+
+
+        <div
+          class="score-circle"
+          id="resultScore"
+        >
+          0%
+        </div>
+
+
+        <p
+          class="result-description"
+          id="resultDescription"
+        >
+          Your result has been saved.
+        </p>
+
+
+
+        <!-- RESULT STATS -->
+
+        <div class="result-stats">
+
+
+          <div class="result-stat">
+
+            <strong id="resultCorrect">
+              0
+            </strong>
+
+            <span>
+              CORRECT
+            </span>
+
+          </div>
+
+
+          <div class="result-stat">
+
+            <strong id="resultTotal">
+              10
+            </strong>
+
+            <span>
+              TOTAL QUESTIONS
+            </span>
+
+          </div>
+
+
+          <div class="result-stat">
+
+            <strong id="resultPercentage">
+              0%
+            </strong>
+
+            <span>
+              ACCURACY
+            </span>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- DIFFICULTY SUMMARY -->
+
+        <div class="difficulty-result">
+
+          <h3>
+            Difficulty progression
+          </h3>
+
+
+          <div class="difficulty-line">
+
+            <span class="difficulty-name">
+              Easy questions
+            </span>
+
+            <strong id="easyCount">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="difficulty-line">
+
+            <span class="difficulty-name">
+              Medium questions
+            </span>
+
+            <strong id="mediumCount">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="difficulty-line">
+
+            <span class="difficulty-name">
+              Hard questions
+            </span>
+
+            <strong id="hardCount">
+              0
+            </strong>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- BUTTONS -->
+
+        <div class="result-buttons">
+
+          <button
+            class="primary-btn"
+            onclick="location.reload()"
+          >
+            Try Another FireDrill
+          </button>
+
+
+          <a
+            href="report.html"
+            class="secondary-btn"
+          >
+            View Progress Report
+          </a>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>
+
+
+
+<!-- ================================================================
+     JAVASCRIPT FILES
+     ================================================================ -->
+
+<script src="js/content.js"></script>
+
+<script src="js/store.js"></script>
+
+
+
+<script>
+
+  /* ==============================================================
+     LOGIN CHECK
+     ============================================================== */
+
+  Store.requireAuth();
+
+
+
+  /* ==============================================================
+     QUIZ STATE
+     ============================================================== */
+
+  let current = {
+
+    category: "",
+
+    questions: [],
+
+    index: 0,
+
+    score: 0,
+
+    correct: 0,
+
+    timeLeft: 30,
+
+    timer: null,
+
+    answered: false,
+
+    currentDifficulty: "easy",
+
+    difficultyHistory: [],
+
+    usedQuestions: []
+
+  };
+
+
+
+  /* ==============================================================
+     DIFFICULTY ORDER
+     ============================================================== */
+
+  const DIFFICULTY_LEVELS = [
+
+    "easy",
+
+    "medium",
+
+    "hard"
+
+  ];
+
+
+
+  /* ==============================================================
+     START QUIZ
+     ============================================================== */
+
+  function startQuiz(category) {
+
+
+    const bank = QUIZ_BANK[category];
+
+
+    if (!bank || !bank.length) {
+
+      alert("No questions available.");
+
+      return;
+
+    }
+
+
+    /* Reset quiz */
+
+    current.category = category;
+
+    current.index = 0;
+
+    current.score = 0;
+
+    current.correct = 0;
+
+    current.timeLeft = 30;
+
+    current.answered = false;
+
+    current.currentDifficulty = "easy";
+
+    current.difficultyHistory = [];
+
+    current.usedQuestions = [];
+
+    current.questions = [...bank];
+
+
+    /* Hide category */
+
+    document.getElementById(
+      "categoryArea"
+    ).style.display = "none";
+
+
+    /* Show quiz */
+
+    document.getElementById(
+      "quizArea"
+    ).style.display = "block";
+
+
+    /* Hide result */
+
+    document.getElementById(
+      "resultArea"
+    ).style.display = "none";
+
+
+    /* Category name */
+
+    document.getElementById(
+      "quizCategory"
+    ).textContent =
+      QUIZ_CATEGORY_LABELS[category] ||
+      category;
+
+
+    renderQuestion();
+
+  }
+
+
+
+  /* ==============================================================
+     GET QUESTIONS FOR DIFFICULTY
+     ============================================================== */
+
+  function getAvailableQuestions(difficulty) {
+
+
+    return current.questions.filter(
+
+      question => {
+
+        const questionDifficulty =
+          question.difficulty || "easy";
+
+
+        const notUsed =
+          !current.usedQuestions.includes(
+            question
+          );
+
+
+        return (
+          questionDifficulty === difficulty &&
+          notUsed
+        );
+
+      }
+
+    );
+
+  }
+
+
+
+  /* ==============================================================
+     FIND QUESTION
+     ============================================================== */
+
+  function findQuestion(difficulty) {
+
+
+    let available =
+      getAvailableQuestions(
+        difficulty
+      );
+
+
+    /* If no question exists at this level,
+       search other levels. */
+
+    if (!available.length) {
+
+
+      if (difficulty === "hard") {
+
+        available =
+          getAvailableQuestions(
+            "medium"
+          );
+
+      }
+
+
+      if (
+        !available.length &&
+        difficulty === "medium"
+      ) {
+
+        available =
+          getAvailableQuestions(
+            "easy"
+          );
+
+      }
+
+
+      if (
+        !available.length &&
+        difficulty === "easy"
+      ) {
+
+        available =
+          getAvailableQuestions(
+            "medium"
+          );
+
+      }
+
+
+      if (!available.length) {
+
+        available =
+          current.questions.filter(
+            question =>
+              !current.usedQuestions.includes(
+                question
+              )
+          );
+
+      }
+
+    }
+
+
+    if (!available.length) {
+
+      return null;
+
+    }
+
+
+    /* Pick random question */
+
+    const randomIndex =
+      Math.floor(
+        Math.random() *
+        available.length
+      );
+
+
+    return available[randomIndex];
+
+  }
+
+
+
+  /* ==============================================================
+     RENDER QUESTION
+     ============================================================== */
+
+  function renderQuestion() {
+
+
+    clearInterval(
+      current.timer
+    );
+
+
+    current.answered = false;
+
+    current.timeLeft = 30;
+
+
+    /* Get adaptive question */
+
+    const question =
+      findQuestion(
+        current.currentDifficulty
+      );
+
+
+    if (!question) {
+
+      finishQuiz();
+
+      return;
+
+    }
+
+
+    /* Remember used question */
+
+    current.usedQuestions.push(
+      question
+    );
+
+
+    /* Remember active question */
+
+    current.activeQuestion =
+      question;
+
+
+    /* Difficulty */
+
+    const difficulty =
+      question.difficulty ||
+      "easy";
+
+
+    current.difficultyHistory.push(
+      difficulty
+    );
+
+
+    /* Progress */
+
+    const questionNumber =
+      current.index + 1;
+
+
+    document.getElementById(
+      "progressText"
+    ).textContent =
+      "Question " +
+      questionNumber +
+      " of 10";
+
+
+    document.getElementById(
+      "currentQuestionNumber"
+    ).textContent =
+      questionNumber;
+
+
+    const progress =
+      (questionNumber / 10) * 100;
+
+
+    document.getElementById(
+      "progressFill"
+    ).style.width =
+      progress + "%";
+
+
+    /* Score */
+
+    document.getElementById(
+      "scoreText"
+    ).textContent =
+      "Score: " +
+      current.score;
+
+
+    document.getElementById(
+      "correctCount"
+    ).textContent =
+      current.correct;
+
+
+    /* Difficulty */
+
+    const difficultyElement =
+      document.getElementById(
+        "difficulty"
+      );
+
+
+    difficultyElement.textContent =
+      difficulty.toUpperCase();
+
+
+    difficultyElement.className =
+      "difficulty " +
+      difficulty;
+
+
+    document.getElementById(
+      "currentDifficultyText"
+    ).textContent =
+      difficulty.toUpperCase();
+
+
+    /* Question */
+
+    document.getElementById(
+      "question"
+    ).textContent =
+      question.q;
+
+
+    /* Options */
+
+    const optionsElement =
+      document.getElementById(
+        "options"
+      );
+
+
+    optionsElement.innerHTML = "";
+
+
+    question.options.forEach(
+
+      (option, index) => {
+
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+
+        button.className =
+          "option";
+
+
+        button.textContent =
+          String.fromCharCode(
+            65 + index
+          ) +
+          ". " +
+          option;
+
+
+        button.onclick =
+          function() {
+
+            selectAnswer(index);
+
+          };
+
+
+        optionsElement.appendChild(
+          button
+        );
+
+      }
+
+    );
+
+
+    /* Clear feedback */
+
+    const feedback =
+      document.getElementById(
+        "feedback"
+      );
+
+
+    feedback.textContent = "";
+
+    feedback.className =
+      "feedback";
+
+
+    /* Hide next */
+
+    document.getElementById(
+      "nextBtn"
+    ).style.display =
+      "none";
+
+
+    /* Start timer */
+
+    updateTimer();
+
+    startTimer();
+
+  }
+
+
+
+  /* ==============================================================
+     TIMER
+     ============================================================== */
+
+  function startTimer() {
+
+
+    current.timer =
+      setInterval(
+
+        function() {
+
+
+          current.timeLeft--;
+
+
+          updateTimer();
+
+
+          if (
+            current.timeLeft <= 0
+          ) {
+
+
+            clearInterval(
+              current.timer
+            );
+
+
+            timeUp();
+
+          }
+
+
+        },
+
+        1000
+
+      );
+
+  }
+
+
+
+  /* ==============================================================
+     UPDATE TIMER
+     ============================================================== */
+
+  function updateTimer() {
+
+
+    const timer =
+      document.getElementById(
+        "timer"
+      );
+
+
+    timer.textContent =
+      "⏱ " +
+      current.timeLeft +
+      "s";
+
+
+    if (
+      current.timeLeft <= 10
+    ) {
+
+      timer.classList.add(
+        "warning"
+      );
+
+    } else {
+
+      timer.classList.remove(
+        "warning"
+      );
+
+    }
+
+  }
+
+
+
+  /* ==============================================================
+     ANSWER SELECT
+     ============================================================== */
+
+  function selectAnswer(
+    selectedIndex
+  ) {
+
+
+    if (
+      current.answered
+    ) {
+
+      return;
+
+    }
+
+
+    current.answered = true;
+
+
+    clearInterval(
+      current.timer
+    );
+
+
+    const question =
+      current.activeQuestion;
+
+
+    const options =
+      document.querySelectorAll(
+        ".option"
+      );
+
+
+    /* Disable options */
+
+    options.forEach(
+
+      function(button, index) {
+
+
+        button.disabled = true;
+
+
+        if (
+          index === question.a
+        ) {
+
+          button.classList.add(
+            "correct"
+          );
+
+        }
+
+      }
+
+    );
+
+
+    const feedback =
+      document.getElementById(
+        "feedback"
+      );
+
+
+    /* Correct */
+
+    if (
+      selectedIndex === question.a
+    ) {
+
+
+      current.score++;
+
+      current.correct++;
+
+
+      options[
+        selectedIndex
+      ].classList.add(
+        "correct"
+      );
+
+
+      increaseDifficulty();
+
+
+      feedback.textContent =
+        "Correct! The next question will be harder.";
+
+
+      feedback.className =
+        "feedback correct";
+
+
+    }
+
+
+    /* Wrong */
+
+    else {
+
+
+      options[
+        selectedIndex
+      ].classList.add(
+        "wrong"
+      );
+
+
+      decreaseDifficulty();
+
+
+      feedback.textContent =
+        "Wrong answer. The next question will be easier.";
+
+
+      feedback.className =
+        "feedback wrong";
+
+    }
+
+
+    /* Update score */
+
+    document.getElementById(
+      "scoreText"
+    ).textContent =
+      "Score: " +
+      current.score;
+
+
+    document.getElementById(
+      "correctCount"
+    ).textContent =
+      current.correct;
+
+
+    /* Show next */
+
+    document.getElementById(
+      "nextBtn"
+    ).style.display =
+      "inline-block";
+
+  }
+
+
+
+  /* ==============================================================
+     TIME UP
+     ============================================================== */
+
+  function timeUp() {
+
+
+    if (
+      current.answered
+    ) {
+
+      return;
+
+    }
+
+
+    current.answered = true;
+
+
+    const question =
+      current.activeQuestion;
+
+
+    const options =
+      document.querySelectorAll(
+        ".option"
+      );
+
+
+    options.forEach(
+
+      function(button, index) {
+
+
+        button.disabled = true;
+
+
+        if (
+          index === question.a
+        ) {
+
+          button.classList.add(
+            "correct"
+          );
+
+        }
+
+      }
+
+    );
+
+
+    /* Time up = wrong */
+
+    decreaseDifficulty();
+
+
+    const feedback =
+      document.getElementById(
+        "feedback"
+      );
+
+
+    feedback.textContent =
+      "Time is up. The correct answer is highlighted. The next question will be easier.";
+
+
+    feedback.className =
+      "feedback wrong";
+
+
+    /* Show next */
+
+    document.getElementById(
+      "nextBtn"
+    ).style.display =
+      "inline-block";
+
+  }
+
+
+
+  /* ==============================================================
+     INCREASE DIFFICULTY
+     ============================================================== */
+
+  function increaseDifficulty() {
+
+
+    const currentIndex =
+      DIFFICULTY_LEVELS.indexOf(
+        current.currentDifficulty
+      );
+
+
+    if (
+      currentIndex <
+      DIFFICULTY_LEVELS.length - 1
+    ) {
+
+
+      current.currentDifficulty =
+        DIFFICULTY_LEVELS[
+          currentIndex + 1
+        ];
+
+    }
+
+  }
+
+
+
+  /* ==============================================================
+     DECREASE DIFFICULTY
+     ============================================================== */
+
+  function decreaseDifficulty() {
+
+
+    const currentIndex =
+      DIFFICULTY_LEVELS.indexOf(
+        current.currentDifficulty
+      );
+
+
+    if (
+      currentIndex > 0
+    ) {
+
+
+      current.currentDifficulty =
+        DIFFICULTY_LEVELS[
+          currentIndex - 1
+        ];
+
+    }
+
+  }
+
+
+
+  /* ==============================================================
+     NEXT QUESTION
+     ============================================================== */
+
+  function nextQuestion() {
+
+
+    current.index++;
+
+
+    if (
+      current.index >= 10
+    ) {
+
+
+      finishQuiz();
+
+
+      return;
+
+    }
+
+
+    renderQuestion();
+
+  }
+
+
+
+  /* ==============================================================
+     FINISH QUIZ
+     ============================================================== */
+
+  function finishQuiz() {
+
+
+    clearInterval(
+      current.timer
+    );
+
+
+    const total =
+      current.difficultyHistory.length;
+
+
+    const percentage =
+      total > 0
+        ? Math.round(
+            (
+              current.score /
+              total
+            ) * 100
+          )
+        : 0;
+
+
+    /* Save normal quiz */
+
+    Store.recordQuiz(
+
+      current.category,
+
+      current.score,
+
+      total
+
+    );
+
+
+    /* Save FireDrill */
+
+    Store.recordFireDrill({
+
+      category:
+        current.category,
+
+      score:
+        current.score,
+
+      total:
+        total,
+
+      percentage:
+        percentage
+
     });
 
-    let current = { category:null, index:0, score:0, questions:[] };
 
-    function startQuiz(cat){
-      current = { category:cat, index:0, score:0, questions: QUIZ_BANK[cat] };
-      grid.style.display = "none";
-      document.getElementById("resultArea").style.display = "none";
-      document.getElementById("quizArea").style.display = "block";
-      renderQuestion();
-    }
+    /* Hide quiz */
 
-    function renderQuestion(){
-      const q = current.questions[current.index];
-      document.getElementById("qProgress").textContent =
-        QUIZ_CATEGORY_LABELS[current.category].toUpperCase() + " — QUESTION " + (current.index+1) + " / " + current.questions.length;
-      document.getElementById("qText").textContent = q.q;
-      const optsEl = document.getElementById("qOptions");
-      optsEl.innerHTML = "";
-      q.options.forEach((opt, i)=>{
-        const b = document.createElement("button");
-        b.className = "option-btn";
-        b.textContent = opt;
-        b.addEventListener("click", ()=> selectAnswer(i));
-        optsEl.appendChild(b);
-      });
-    }
+    document.getElementById(
+      "quizArea"
+    ).style.display =
+      "none";
 
-    function selectAnswer(i){
-      const q = current.questions[current.index];
-      const buttons = document.querySelectorAll("#qOptions .option-btn");
-      buttons.forEach(b=>b.disabled = true);
-      buttons[q.a].classList.add("correct");
-      if(i !== q.a){ buttons[i].classList.add("wrong"); } else { current.score++; }
 
-      setTimeout(()=>{
-        current.index++;
-        if(current.index < current.questions.length){
-          renderQuestion();
-        }else{
-          finishQuiz();
-        }
-      }, 700);
-    }
+    /* Show result */
 
-    function finishQuiz(){
-      document.getElementById("quizArea").style.display = "none";
-      const pct = Math.round((current.score / current.questions.length) * 100);
-      Store.recordQuiz(current.category, current.score, current.questions.length);
-      document.getElementById("resultArea").style.display = "block";
-      document.getElementById("resultScore").textContent = current.score + " / " + current.questions.length;
-      let msg = pct >= 75 ? "Strong round — keep this pace up." :
-                pct >= 45 ? "Decent, but there's clear room to tighten this up." :
-                "This category needs focused revision before your next attempt.";
-      document.getElementById("resultMsg").textContent = msg + " Saved to your progress report.";
-    }
+    document.getElementById(
+      "resultArea"
+    ).style.display =
+      "block";
 
-    document.getElementById("retryBtn").addEventListener("click", ()=> startQuiz(current.category));
-  </script>
+
+    /* Score */
+
+    document.getElementById(
+      "resultScore"
+    ).textContent =
+      percentage + "%";
+
+
+    document.getElementById(
+      "resultCorrect"
+    ).textContent =
+      current.score;
+
+
+    document.getElementById(
+      "resultTotal"
+    ).textContent =
+      total;
+
+
+    document.getElementById(
+      "resultPercentage"
+    ).textContent =
+      percentage + "%";
+
+
+    /* Description */
+
+    document.getElementById(
+      "resultDescription"
+    ).textContent =
+      "Your FireDrill result has been saved to your progress report.";
+
+
+    /* Difficulty counts */
+
+    const easyCount =
+      current.difficultyHistory.filter(
+        difficulty =>
+          difficulty === "easy"
+      ).length;
+
+
+    const mediumCount =
+      current.difficultyHistory.filter(
+        difficulty =>
+          difficulty === "medium"
+      ).length;
+
+
+    const hardCount =
+      current.difficultyHistory.filter(
+        difficulty =>
+          difficulty === "hard"
+      ).length;
+
+
+    document.getElementById(
+      "easyCount"
+    ).textContent =
+      easyCount;
+
+
+    document.getElementById(
+      "mediumCount"
+    ).textContent =
+      mediumCount;
+
+
+    document.getElementById(
+      "hardCount"
+    ).textContent =
+      hardCount;
+
+  }
+
+</script>
+
+
 </body>
+
 </html>
