@@ -1,23 +1,11 @@
 
-/* =====================================================
-   PREPMATE — LOCAL DATA STORE
-   Authentication, student progress and career selection
-
-   NOTE:
-   This uses localStorage and is intended for a
-   browser-based prototype, not production authentication.
-===================================================== */
+/* PrepMate — Merged Local Data Store */
 
 const DB_USERS = "prepmate_users";
 const DB_SESSION = "prepmate_session";
 const DB_PREFIX = "prepmate_data_";
 
 const Store = {
-
-  // ==============================
-  // LOCAL STORAGE HELPERS
-  // ==============================
-
   _read(key, fallback) {
     try {
       const raw = localStorage.getItem(key);
@@ -31,28 +19,13 @@ const Store = {
     localStorage.setItem(key, JSON.stringify(value));
   },
 
-  // Existing prototype password hash.
-  // Retained for compatibility with existing accounts.
-  // NOT cryptographically secure.
   _hash(str) {
     let h = 0;
-
     for (let i = 0; i < str.length; i++) {
-      h = (
-        Math.imul(31, h) + str.charCodeAt(i)
-      ) | 0;
+      h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
     }
-
-    return (
-      "h" +
-      Math.abs(h).toString(36) +
-      str.length
-    );
+    return "h" + Math.abs(h).toString(36) + str.length;
   },
-
-  // ==============================
-  // USER MANAGEMENT
-  // ==============================
 
   getUsers() {
     return this._read(DB_USERS, {});
@@ -62,17 +35,8 @@ const Store = {
     this._write(DB_USERS, users);
   },
 
-  signup({
-    name,
-    email,
-    password,
-    branch,
-    gradYear,
-    targetRole
-  }) {
-
+  signup({ name, email, password, branch, gradYear, targetRole }) {
     const users = this.getUsers();
-
     const key = email.trim().toLowerCase();
 
     if (users[key]) {
@@ -85,40 +49,24 @@ const Store = {
     users[key] = {
       name: name.trim(),
       email: key,
-
       password: this._hash(password),
-
       branch: branch || "",
       gradYear: gradYear || "",
-
       targetRole: targetRole || "",
-
-      // New career-selection fields
       careerId: "",
       careerSelectedAt: null,
-
       createdAt: Date.now()
     };
 
     this.saveUsers(users);
-
     this.initUserData(key);
 
-    return {
-      ok: true
-    };
+    return { ok: true };
   },
 
-  // ==============================
-  // LOGIN AND LOGOUT
-  // ==============================
-
   login(email, password) {
-
     const users = this.getUsers();
-
     const key = email.trim().toLowerCase();
-
     const user = users[key];
 
     if (!user) {
@@ -135,13 +83,8 @@ const Store = {
       };
     }
 
-    this._write(DB_SESSION, {
-      email: key
-    });
-
-    return {
-      ok: true
-    };
+    this._write(DB_SESSION, { email: key });
+    return { ok: true };
   },
 
   logout() {
@@ -149,54 +92,31 @@ const Store = {
   },
 
   currentUserEmail() {
-
-    const session = this._read(
-      DB_SESSION,
-      null
-    );
-
-    return session
-      ? session.email
-      : null;
+    const session = this._read(DB_SESSION, null);
+    return session ? session.email : null;
   },
 
   currentUser() {
-
     const email = this.currentUserEmail();
+    if (!email) return null;
 
-    if (!email) {
-      return null;
-    }
-
-    const users = this.getUsers();
-
-    return users[email] || null;
+    return this.getUsers()[email] || null;
   },
 
   requireAuth() {
-
     if (!this.currentUser()) {
       window.location.href = "index.html";
     }
   },
 
-  // ==============================
-  // CAREER PATH MANAGEMENT
-  // ==============================
+  // Career selection
 
   setCareerPath(careerId, careerName) {
-
     const email = this.currentUserEmail();
-
-    if (!email) {
-      return false;
-    }
+    if (!email) return false;
 
     const users = this.getUsers();
-
-    if (!users[email]) {
-      return false;
-    }
+    if (!users[email]) return false;
 
     if (
       typeof careerId !== "string" ||
@@ -207,206 +127,152 @@ const Store = {
       return false;
     }
 
-    // Update the student's career profile.
     users[email].careerId = careerId;
     users[email].targetRole = careerName;
     users[email].careerSelectedAt = Date.now();
 
     this.saveUsers(users);
-
     return true;
   },
 
   getCareerPath() {
-
     const user = this.currentUser();
-
-    if (!user) {
-      return "";
-    }
-
-    return user.careerId || "";
+    return user ? user.careerId || "" : "";
   },
 
   getCareerName() {
-
     const user = this.currentUser();
-
-    if (!user) {
-      return "";
-    }
-
-    return user.targetRole || "";
+    return user ? user.targetRole || "" : "";
   },
 
   hasSelectedCareer() {
-
-    return Boolean(
-      this.getCareerPath()
-    );
+    return Boolean(this.getCareerPath());
   },
 
-  // ==============================
-  // STUDENT DATA
-  // ==============================
+  // Student progress
 
   initUserData(email) {
-
     const key = DB_PREFIX + email;
 
     if (!localStorage.getItem(key)) {
-
       this._write(key, {
-
         quizAttempts: [],
-
+        firedrillAttempts: [],
         interviewRatings: {},
-
         checklist: {},
-
         planner: {},
-
         targetDate: "",
-
         customTasks: []
-
       });
     }
   },
 
   getData() {
-
     const email = this.currentUserEmail();
-
-    if (!email) {
-      return null;
-    }
+    if (!email) return null;
 
     this.initUserData(email);
 
-    return this._read(
-      DB_PREFIX + email,
-      null
-    );
+    const data = this._read(DB_PREFIX + email, null);
+
+    // Upgrade existing accounts without deleting progress.
+    if (data && !Array.isArray(data.firedrillAttempts)) {
+      data.firedrillAttempts = [];
+      this.saveData(data);
+    }
+
+    return data;
   },
 
   saveData(data) {
-
     const email = this.currentUserEmail();
+    if (!email) return;
 
-    if (!email) {
-      return;
-    }
-
-    this._write(
-      DB_PREFIX + email,
-      data
-    );
+    this._write(DB_PREFIX + email, data);
   },
 
-  // ==============================
-  // QUIZ MANAGEMENT
-  // ==============================
+  // Normal quizzes
 
   recordQuiz(category, score, total) {
-
     const data = this.getData();
+    if (!data) return;
 
-    if (!data) {
-      return;
+    if (!Array.isArray(data.quizAttempts)) {
+      data.quizAttempts = [];
     }
 
     data.quizAttempts.push({
-
-      category: category,
-
-      score: score,
-
-      total: total,
-
+      category,
+      score,
+      total,
       date: Date.now()
-
     });
 
     this.saveData(data);
   },
 
-  // ==============================
-  // INTERVIEW MANAGEMENT
-  // ==============================
+  // Teammate's FireDrill
 
-  rateInterviewQuestion(questionId, rating) {
-
+  recordFireDrill(attempt) {
     const data = this.getData();
+    if (!data) return;
 
-    if (!data) {
-      return;
+    if (!Array.isArray(data.firedrillAttempts)) {
+      data.firedrillAttempts = [];
     }
 
-    if (!data.interviewRatings[questionId]) {
-
-      data.interviewRatings[questionId] = [];
-
-    }
-
-    data.interviewRatings[questionId].push(
-      rating
-    );
+    data.firedrillAttempts.push({
+      category: attempt.category,
+      score: attempt.score,
+      total: attempt.total,
+      percentage: attempt.percentage,
+      date: Date.now()
+    });
 
     this.saveData(data);
   },
 
-  // ==============================
-  // CHECKLIST MANAGEMENT
-  // ==============================
+  // Interview
 
-  toggleChecklist(itemId) {
-
+  rateInterviewQuestion(questionId, rating) {
     const data = this.getData();
+    if (!data) return;
 
-    if (!data) {
-      return false;
+    if (!data.interviewRatings[questionId]) {
+      data.interviewRatings[questionId] = [];
     }
 
-    data.checklist[itemId] =
-      !data.checklist[itemId];
+    data.interviewRatings[questionId].push(rating);
+    this.saveData(data);
+  },
 
+  // Readiness checklist
+
+  toggleChecklist(itemId) {
+    const data = this.getData();
+    if (!data) return false;
+
+    data.checklist[itemId] = !data.checklist[itemId];
     this.saveData(data);
 
     return data.checklist[itemId];
   },
 
-  // ==============================
-  // STUDY PLANNER
-  // ==============================
+  // Study planner
 
   togglePlanner(taskId) {
-
     const data = this.getData();
+    if (!data) return false;
 
-    if (!data) {
-      return false;
-    }
-
-    data.planner[taskId] =
-      !data.planner[taskId];
-
+    data.planner[taskId] = !data.planner[taskId];
     this.saveData(data);
 
     return data.planner[taskId];
   },
 
-  // ==============================
-  // CUSTOM STUDY TASKS
-  // ==============================
-
   addCustomTask(text) {
-
     const data = this.getData();
-
-    if (!data) {
-      return null;
-    }
+    if (!data) return null;
 
     const id =
       "custom_" +
@@ -414,52 +280,29 @@ const Store = {
       "_" +
       Math.random().toString(36).slice(2, 7);
 
-    data.customTasks.push({
-
-      id: id,
-
-      text: text
-
-    });
-
+    data.customTasks.push({ id, text });
     this.saveData(data);
 
     return id;
   },
 
   removeCustomTask(id) {
-
     const data = this.getData();
+    if (!data) return;
 
-    if (!data) {
-      return;
-    }
-
-    data.customTasks =
-      data.customTasks.filter(
-        task => task.id !== id
-      );
+    data.customTasks = data.customTasks.filter(
+      task => task.id !== id
+    );
 
     delete data.planner[id];
-
     this.saveData(data);
   },
 
-  // ==============================
-  // TARGET PLACEMENT DATE
-  // ==============================
-
   setTargetDate(dateStr) {
-
     const data = this.getData();
-
-    if (!data) {
-      return;
-    }
+    if (!data) return;
 
     data.targetDate = dateStr;
-
     this.saveData(data);
   }
-
 };
