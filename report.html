@@ -1,169 +1,1950 @@
 <!doctype html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrepMate — Progress report</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>PrepMate — Progress Report</title>
+
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"
+  rel="stylesheet"
+>
+
+<link
+  rel="stylesheet"
+  href="css/base.css"
+>
+
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"
+></script>
+
+
 <style>
-  .chart-panel canvas{ max-height: 280px; }
-  .breakdown-row{ display:flex; justify-content:space-between; align-items:center; gap:var(--s-3); padding: var(--s-2) 0; }
-  .breakdown-row .bar{ flex:1; }
-  .breakdown-row .pct{ width:44px; text-align:right; font-family:var(--f-mono); font-size:.85rem; }
+
+/* ================================================================
+   CHART
+   ================================================================ */
+
+.chart-panel canvas {
+  max-height: 280px;
+}
+
+
+/* ================================================================
+   BREAKDOWN ROW
+   ================================================================ */
+
+.breakdown-row {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: var(--s-3);
+
+  padding: var(--s-2) 0;
+
+}
+
+
+.breakdown-row .bar {
+  flex: 1;
+}
+
+
+.breakdown-row .pct {
+
+  width: 55px;
+
+  text-align: right;
+
+  font-family: var(--f-mono);
+
+  font-size: .85rem;
+
+}
+
+
+/* ================================================================
+   FIREDRILL STATS
+   ================================================================ */
+
+.firedrill-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: var(--s-4);
+
+  margin-bottom: var(--s-6);
+
+}
+
+
+.firedrill-stat {
+
+  padding: var(--s-5);
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+  background: var(--panel);
+
+  text-align: center;
+
+}
+
+
+.firedrill-stat .stat-label {
+
+  color: var(--text-dim);
+
+  font-size: .85rem;
+
+  margin-bottom: 8px;
+
+}
+
+
+.firedrill-stat .stat-value {
+
+  font-size: 1.8rem;
+
+  font-weight: 700;
+
+  color: var(--text);
+
+}
+
+
+/* ================================================================
+   WEAK TOPICS
+   ================================================================ */
+
+.weak-topics {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: var(--s-4);
+
+  margin-top: var(--s-4);
+
+}
+
+
+.weak-topic-card {
+
+  border: 1px solid #6b3b3b;
+
+  border-radius: 10px;
+
+  padding: var(--s-4);
+
+  background: #1b2028;
+
+}
+
+
+.weak-topic-card h4 {
+
+  margin: 0 0 8px 0;
+
+  color: #ffffff;
+
+  font-size: 1rem;
+
+}
+
+
+.weak-topic-card .weak-label {
+
+  color: #ff8b8b;
+
+  font-size: .8rem;
+
+  font-weight: 600;
+
+  margin-bottom: 8px;
+
+}
+
+
+.weak-topic-card .weak-score {
+
+  font-size: 1.5rem;
+
+  font-weight: 700;
+
+  color: #ffffff;
+
+}
+
+
+.weak-topic-card .weak-bar {
+
+  width: 100%;
+
+  height: 7px;
+
+  background: #343b45;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  margin-top: 12px;
+
+}
+
+
+.weak-topic-card .weak-bar span {
+
+  display: block;
+
+  height: 100%;
+
+  background: #e85d5d;
+
+  border-radius: 10px;
+
+}
+
+
+.weak-empty {
+
+  color: var(--text-dim);
+
+  padding: var(--s-3) 0;
+
+}
+
+
+.weak-description {
+
+  color: var(--text-dim);
+
+  font-size: .9rem;
+
+  margin-top: 4px;
+
+}
+
+
+/* ================================================================
+   FIREDRILL SECTION
+   ================================================================ */
+
+.firedrill-empty {
+
+  color: var(--text-dim);
+
+  padding: var(--s-3) 0;
+
+}
+
+
+/* ================================================================
+   ASSESSMENT HISTORY
+   ================================================================ */
+
+.history-list {
+
+  margin-top: var(--s-4);
+
+}
+
+
+.history-row {
+
+  display: grid;
+
+  grid-template-columns:
+    1.5fr 1fr 1fr 1fr;
+
+  align-items: center;
+
+  gap: var(--s-3);
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid var(--border);
+
+}
+
+
+.history-row:last-child {
+
+  border-bottom: none;
+
+}
+
+
+.history-header {
+
+  color: var(--text-dim);
+
+  font-size: .75rem;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: .05em;
+
+}
+
+
+.history-category {
+
+  color: var(--text);
+
+  font-weight: 600;
+
+}
+
+
+.history-score {
+
+  font-family: var(--f-mono);
+
+  color: var(--text);
+
+}
+
+
+.history-percentage {
+
+  font-family: var(--f-mono);
+
+  font-weight: 700;
+
+}
+
+
+.history-date {
+
+  color: var(--text-dim);
+
+  font-size: .85rem;
+
+}
+
+
+.history-empty {
+
+  color: var(--text-dim);
+
+  padding: var(--s-4) 0;
+
+}
+
+
+/* ================================================================
+   MOBILE
+   ================================================================ */
+
+@media (max-width: 700px) {
+
+  .firedrill-stats {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .history-row {
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+
+  }
+
+
+  .history-header {
+
+    display: none;
+
+  }
+
+}
+
 </style>
+
 </head>
+
+
 <body>
-  <div class="app-shell">
-    <nav class="deck-nav">
-      <div class="brand">Prep<span class="dot">Mate</span></div>
-      <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
-        <a href="practice.html">Practice zone</a>
-        <a href="interview.html">Mock interview</a>
-        <a href="planner.html">Study planner</a>
-        <a href="report.html" class="active">Progress report</a>
-      </div>
-      <div class="nav-foot">
-        <span id="navUserName">—</span>
-        <button class="btn-ghost btn-block" id="logoutBtn">Sign out</button>
-      </div>
-    </nav>
 
-    <main class="deck-main">
-      <header class="deck-header">
-        <div>
-          <div class="kicker">Self-evaluation</div>
-          <h1>Where you actually stand</h1>
-        </div>
-      </header>
+<div class="app-shell">
 
-      <div class="grid grid-2" style="margin-bottom: var(--s-6);">
-        <div class="panel chart-panel">
-          <h3>Accuracy by category</h3>
-          <canvas id="categoryChart"></canvas>
-        </div>
-        <div class="panel chart-panel">
-          <h3>Quiz score trend</h3>
-          <canvas id="trendChart"></canvas>
-        </div>
-      </div>
 
-      <div class="panel" style="margin-bottom: var(--s-6);">
-        <h3>Readiness breakdown</h3>
-        <div id="breakdownContainer"></div>
-      </div>
+<!-- ================================================================
+     NAVIGATION
+     ================================================================ -->
 
-      <div class="panel">
-        <h3>Interview confidence by question</h3>
-        <div id="interviewBreakdown"></div>
-      </div>
-    </main>
+<nav class="deck-nav">
+
+  <div class="brand">
+
+    Prep<span class="dot">Mate</span>
+
   </div>
 
-  <script src="js/store.js"></script>
-  <script src="js/content.js"></script>
-  <script src="js/readiness.js"></script>
-  <script>
-    Store.requireAuth();
-    const user = Store.currentUser();
-    document.getElementById("navUserName").textContent = user.name;
-    document.getElementById("logoutBtn").addEventListener("click", ()=>{ Store.logout(); window.location.href="index.html"; });
 
-    const data = Store.getData();
+  <div class="nav-links">
 
-    // chart theme
-    Chart.defaults.color = "#9FAEBA";
-    Chart.defaults.font.family = "Inter, sans-serif";
-    Chart.defaults.borderColor = "#2A3A47";
+    <a href="dashboard.html">
+      Dashboard
+    </a>
 
-    const categories = Object.keys(QUIZ_BANK);
-    const categoryAverages = categories.map(c => Readiness.quizAverageByCategory(data, c) || 0);
+    <a href="practice.html">
+      Practice zone
+    </a>
 
-    new Chart(document.getElementById("categoryChart"), {
-      type: "bar",
-      data: {
-        labels: categories.map(c => QUIZ_CATEGORY_LABELS[c]),
-        datasets: [{
-          label: "Accuracy %",
-          data: categoryAverages,
-          backgroundColor: "#F5A623",
-          borderRadius: 3
-        }]
-      },
-      options: {
-        plugins: { legend: { display:false } },
-        scales: { y: { min:0, max:100, grid:{ color:"#21303C" } }, x: { grid:{ display:false } } }
-      }
-    });
+    <a href="interview.html">
+      Mock interview
+    </a>
 
-    const attempts = data.quizAttempts.slice(-15);
-    new Chart(document.getElementById("trendChart"), {
-      type: "line",
-      data: {
-        labels: attempts.map((a,i) => "#" + (i+1)),
-        datasets: [{
-          label: "Score %",
-          data: attempts.map(a => Math.round((a.score/a.total)*100)),
-          borderColor: "#3ED598",
-          backgroundColor: "rgba(62,213,152,.15)",
-          tension: .3,
-          fill: true,
-          pointRadius: 3
-        }]
-      },
-      options: {
-        plugins: { legend: { display:false } },
-        scales: { y: { min:0, max:100, grid:{ color:"#21303C" } }, x: { grid:{ display:false } } }
-      }
-    });
+    <a href="planner.html">
+      Study planner
+    </a>
 
-    if(!attempts.length){
-      document.getElementById("trendChart").parentElement.innerHTML += '<p class="hint" style="margin-top:var(--s-3);">No quiz attempts yet — this will fill in once you practice.</p>';
-    }
+    <a
+      href="report.html"
+      class="active"
+    >
+      Progress report
+    </a>
 
-    // readiness breakdown
-    const breakdown = [
-      { label:"Quiz accuracy", val: Readiness.quizAverage(data) },
-      { label:"Interview confidence", val: Readiness.interviewAverage(data) },
-      { label:"Planner completion", val: Readiness.plannerCompletion(data) },
-      { label:"Checklist completion", val: Readiness.checklistCompletion(data) },
-    ];
-    const breakdownEl = document.getElementById("breakdownContainer");
-    breakdown.forEach(b=>{
-      const val = b.val === null ? 0 : b.val;
-      const row = document.createElement("div");
-      row.className = "breakdown-row";
+  </div>
+
+
+  <div class="nav-foot">
+
+    <span id="navUserName">
+      —
+    </span>
+
+    <button
+      class="btn-ghost btn-block"
+      id="logoutBtn"
+    >
+      Sign out
+    </button>
+
+  </div>
+
+</nav>
+
+
+<!-- ================================================================
+     MAIN
+     ================================================================ -->
+
+<main class="deck-main">
+
+
+<header class="deck-header">
+
+  <div>
+
+    <div class="kicker">
+      Self-evaluation
+    </div>
+
+    <h1>
+      Where you actually stand
+    </h1>
+
+  </div>
+
+</header>
+
+
+<!-- ================================================================
+     FIREDRILL STATISTICS
+     ================================================================ -->
+
+<div
+  class="firedrill-stats"
+  id="firedrillStats"
+>
+
+
+  <div class="firedrill-stat">
+
+    <div class="stat-label">
+      🔥 FireDrill Attempts
+    </div>
+
+    <div
+      class="stat-value"
+      id="fireAttempts"
+    >
+      0
+    </div>
+
+  </div>
+
+
+  <div class="firedrill-stat">
+
+    <div class="stat-label">
+      🎯 Average Accuracy
+    </div>
+
+    <div
+      class="stat-value"
+      id="fireAverage"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+  <div class="firedrill-stat">
+
+    <div class="stat-label">
+      🏆 Best Score
+    </div>
+
+    <div
+      class="stat-value"
+      id="fireBest"
+    >
+      0%
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- ================================================================
+     WEAK TOPICS
+     ================================================================ -->
+
+<div
+  class="panel"
+  style="margin-bottom: var(--s-6);"
+>
+
+  <h3>
+    🎯 Weak Topics
+  </h3>
+
+
+  <p class="weak-description">
+    Topics below 60% accuracy need more practice.
+  </p>
+
+
+  <div
+    id="weakTopicsContainer"
+    class="weak-topics"
+  ></div>
+
+</div>
+
+
+<!-- ================================================================
+     ASSESSMENT HISTORY
+     ================================================================ -->
+
+<div
+  class="panel"
+  style="margin-bottom: var(--s-6);"
+>
+
+  <h3>
+    🔥 Recent FireDrill Attempts
+  </h3>
+
+
+  <p class="weak-description">
+    Your latest assessment results are shown here.
+  </p>
+
+
+  <div
+    id="historyContainer"
+    class="history-list"
+  ></div>
+
+</div>
+
+
+<!-- ================================================================
+     FIREDRILL CHARTS
+     ================================================================ -->
+
+<div
+  class="grid grid-2"
+  style="margin-bottom: var(--s-6);"
+>
+
+
+  <div class="panel chart-panel">
+
+    <h3>
+      🔥 FireDrill Score Trend
+    </h3>
+
+    <canvas
+      id="fireDrillTrendChart"
+    ></canvas>
+
+    <p
+      id="fireDrillTrendEmpty"
+      class="firedrill-empty"
+    >
+      No FireDrill attempts yet.
+    </p>
+
+  </div>
+
+
+  <div class="panel chart-panel">
+
+    <h3>
+      📚 FireDrill Category Accuracy
+    </h3>
+
+    <canvas
+      id="fireDrillCategoryChart"
+    ></canvas>
+
+    <p
+      id="fireDrillCategoryEmpty"
+      class="firedrill-empty"
+    >
+      No FireDrill category data yet.
+    </p>
+
+  </div>
+
+
+</div>
+
+
+<!-- ================================================================
+     NORMAL QUIZ CHARTS
+     ================================================================ -->
+
+<div
+  class="grid grid-2"
+  style="margin-bottom: var(--s-6);"
+>
+
+
+  <div class="panel chart-panel">
+
+    <h3>
+      Accuracy by category
+    </h3>
+
+    <canvas
+      id="categoryChart"
+    ></canvas>
+
+  </div>
+
+
+  <div class="panel chart-panel">
+
+    <h3>
+      Quiz score trend
+    </h3>
+
+    <canvas
+      id="trendChart"
+    ></canvas>
+
+  </div>
+
+
+</div>
+
+
+<!-- ================================================================
+     READINESS BREAKDOWN
+     ================================================================ -->
+
+<div
+  class="panel"
+  style="margin-bottom: var(--s-6);"
+>
+
+  <h3>
+    Readiness breakdown
+  </h3>
+
+  <div
+    id="breakdownContainer"
+  ></div>
+
+</div>
+
+
+<!-- ================================================================
+     INTERVIEW BREAKDOWN
+     ================================================================ -->
+
+<div class="panel">
+
+  <h3>
+    Interview confidence by question
+  </h3>
+
+  <div
+    id="interviewBreakdown"
+  ></div>
+
+</div>
+
+
+</main>
+
+</div>
+
+
+<!-- ================================================================
+     JAVASCRIPT FILES
+     ================================================================ -->
+
+<script src="js/store.js"></script>
+
+<script src="js/content.js"></script>
+
+<script src="js/readiness.js"></script>
+
+
+<script>
+
+/* ================================================================
+   AUTH
+   ================================================================ */
+
+Store.requireAuth();
+
+
+const user =
+  Store.currentUser();
+
+
+document.getElementById(
+  "navUserName"
+).textContent =
+  user.name;
+
+
+document.getElementById(
+  "logoutBtn"
+).addEventListener(
+  "click",
+  () => {
+
+    Store.logout();
+
+    window.location.href =
+      "index.html";
+
+  }
+);
+
+
+/* ================================================================
+   USER DATA
+   ================================================================ */
+
+const data =
+  Store.getData();
+
+
+/* ================================================================
+   CHART THEME
+   ================================================================ */
+
+Chart.defaults.color =
+  "#9FAEBA";
+
+Chart.defaults.font.family =
+  "Inter, sans-serif";
+
+Chart.defaults.borderColor =
+  "#2A3A47";
+
+
+/* ================================================================
+   FIREDRILL DATA
+   ================================================================ */
+
+const fireAttempts =
+  data.firedrillAttempts || [];
+
+
+/* ================================================================
+   FIREDRILL STATISTICS
+   ================================================================ */
+
+document.getElementById(
+  "fireAttempts"
+).textContent =
+  fireAttempts.length;
+
+
+if (fireAttempts.length > 0) {
+
+
+  const percentages =
+    fireAttempts.map(
+      attempt =>
+        Number(
+          attempt.percentage
+        ) || 0
+    );
+
+
+  const totalPercentage =
+    percentages.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    );
+
+
+  const average =
+    Math.round(
+      totalPercentage /
+      percentages.length
+    );
+
+
+  const best =
+    Math.max(
+      ...percentages
+    );
+
+
+  document.getElementById(
+    "fireAverage"
+  ).textContent =
+    average + "%";
+
+
+  document.getElementById(
+    "fireBest"
+  ).textContent =
+    best + "%";
+
+}
+
+
+/* ================================================================
+   ASSESSMENT HISTORY
+   ================================================================ */
+
+const historyContainer =
+  document.getElementById(
+    "historyContainer"
+  );
+
+
+if (!fireAttempts.length) {
+
+
+  historyContainer.innerHTML = `
+
+    <div class="history-empty">
+
+      No FireDrill attempts yet.
+      Complete a FireDrill to see your history here.
+
+    </div>
+
+  `;
+
+
+} else {
+
+
+  /* --------------------------------------------------------------
+     HEADER
+     -------------------------------------------------------------- */
+
+  const header =
+    document.createElement(
+      "div"
+    );
+
+
+  header.className =
+    "history-row history-header";
+
+
+  header.innerHTML = `
+
+    <div>
+      Category
+    </div>
+
+    <div>
+      Score
+    </div>
+
+    <div>
+      Accuracy
+    </div>
+
+    <div>
+      Date
+    </div>
+
+  `;
+
+
+  historyContainer.appendChild(
+    header
+  );
+
+
+  /* --------------------------------------------------------------
+     SHOW LATEST 10 ATTEMPTS
+     -------------------------------------------------------------- */
+
+  const recentAttempts =
+    fireAttempts
+      .slice(-10)
+      .reverse();
+
+
+  recentAttempts.forEach(
+    attempt => {
+
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+
+      row.className =
+        "history-row";
+
+
+      const categoryLabel =
+        QUIZ_CATEGORY_LABELS[
+          attempt.category
+        ] || attempt.category;
+
+
+      const percentage =
+        Number(
+          attempt.percentage
+        ) || 0;
+
+
+      const date =
+        attempt.date
+          ? new Date(
+              attempt.date
+            ).toLocaleDateString(
+              "en-IN",
+              {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+              }
+            )
+          : "—";
+
+
       row.innerHTML = `
-        <span style="width:180px;color:var(--text-dim);font-size:.9rem;">${b.label}</span>
-        <div class="bar"><span style="width:${val}%"></span></div>
-        <span class="pct">${b.val===null ? "—" : val+"%"}</span>
-      `;
-      breakdownEl.appendChild(row);
-    });
 
-    // interview breakdown
-    const interviewEl = document.getElementById("interviewBreakdown");
-    const allInterviewQs = [...INTERVIEW_QUESTIONS.hr, ...INTERVIEW_QUESTIONS.technical];
-    const rated = allInterviewQs.filter(q => data.interviewRatings[q.id] && data.interviewRatings[q.id].length);
-    if(!rated.length){
-      interviewEl.innerHTML = '<p class="hint">No mock interview questions rated yet.</p>';
-    }else{
-      rated.forEach(q=>{
-        const ratings = data.interviewRatings[q.id];
-        const avg = Math.round((ratings.reduce((s,r)=>s+r,0)/ratings.length)*10)/10;
-        const row = document.createElement("div");
-        row.className = "breakdown-row";
-        row.innerHTML = `
-          <span style="flex:1;color:var(--text-dim);font-size:.88rem;">${q.q}</span>
-          <div class="bar" style="max-width:120px;"><span style="width:${avg/5*100}%"></span></div>
-          <span class="pct">${avg}/5</span>
-        `;
-        interviewEl.appendChild(row);
-      });
+        <div class="history-category">
+          ${categoryLabel}
+        </div>
+
+
+        <div class="history-score">
+          ${attempt.score} / ${attempt.total}
+        </div>
+
+
+        <div class="history-percentage">
+          ${percentage}%
+        </div>
+
+
+        <div class="history-date">
+          ${date}
+        </div>
+
+      `;
+
+
+      historyContainer.appendChild(
+        row
+      );
+
     }
-  </script>
+  );
+
+}
+
+
+/* ================================================================
+   WEAK TOPIC DETECTION
+   ================================================================ */
+
+const weakTopics =
+  Readiness.weakTopics(
+    data
+  );
+
+
+const weakTopicsContainer =
+  document.getElementById(
+    "weakTopicsContainer"
+  );
+
+
+if (!weakTopics.length) {
+
+
+  weakTopicsContainer.innerHTML = `
+
+    <div class="weak-empty">
+
+      ${
+        data.quizAttempts.length === 0
+
+        ? "Complete some quiz questions to detect weak topics."
+
+        : "🎉 No weak topics detected. Keep practising!"
+
+      }
+
+    </div>
+
+  `;
+
+
+} else {
+
+
+  weakTopics.forEach(
+    topic => {
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "weak-topic-card";
+
+
+      card.innerHTML = `
+
+        <div class="weak-label">
+          NEEDS PRACTICE
+        </div>
+
+
+        <h4>
+          ${topic.label}
+        </h4>
+
+
+        <div class="weak-score">
+          ${topic.accuracy}%
+        </div>
+
+
+        <div class="weak-description">
+          Accuracy
+        </div>
+
+
+        <div class="weak-bar">
+
+          <span
+            style="
+              width:${topic.accuracy}%;
+            "
+          ></span>
+
+        </div>
+
+      `;
+
+
+      weakTopicsContainer.appendChild(
+        card
+      );
+
+    }
+  );
+
+
+  const message =
+    document.createElement(
+      "div"
+    );
+
+
+  message.style.gridColumn =
+    "1 / -1";
+
+
+  message.className =
+    "weak-description";
+
+
+  message.innerHTML =
+    "💡 Practice these topics again to improve your assessment performance.";
+
+
+  weakTopicsContainer.appendChild(
+    message
+  );
+
+}
+
+
+/* ================================================================
+   FIREDRILL TREND CHART
+   ================================================================ */
+
+const fireTrendCanvas =
+  document.getElementById(
+    "fireDrillTrendChart"
+  );
+
+
+const fireTrendEmpty =
+  document.getElementById(
+    "fireDrillTrendEmpty"
+  );
+
+
+if (fireAttempts.length > 0) {
+
+
+  fireTrendEmpty.style.display =
+    "none";
+
+
+  const recentFireAttempts =
+    fireAttempts.slice(-15);
+
+
+  new Chart(
+    fireTrendCanvas,
+    {
+
+      type: "line",
+
+      data: {
+
+        labels:
+          recentFireAttempts.map(
+            (attempt, index) =>
+              "#" + (index + 1)
+          ),
+
+
+        datasets: [
+
+          {
+
+            label:
+              "FireDrill Accuracy %",
+
+            data:
+              recentFireAttempts.map(
+                attempt =>
+                  Number(
+                    attempt.percentage
+                  ) || 0
+              ),
+
+            borderColor:
+              "#F5A623",
+
+            backgroundColor:
+              "rgba(245,166,35,.15)",
+
+            tension:
+              .3,
+
+            fill:
+              true,
+
+            pointRadius:
+              4
+
+          }
+
+        ]
+
+      },
+
+
+      options: {
+
+        plugins: {
+
+          legend: {
+            display: false
+          }
+
+        },
+
+
+        scales: {
+
+          y: {
+
+            min: 0,
+
+            max: 100,
+
+            grid: {
+              color: "#21303C"
+            }
+
+          },
+
+
+          x: {
+
+            grid: {
+              display: false
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ================================================================
+   FIREDRILL CATEGORY DATA
+   ================================================================ */
+
+const fireCategoryScores = {};
+
+
+fireAttempts.forEach(
+  attempt => {
+
+    const category =
+      attempt.category;
+
+
+    if (!category) {
+      return;
+    }
+
+
+    if (!fireCategoryScores[category]) {
+
+      fireCategoryScores[category] =
+        [];
+
+    }
+
+
+    fireCategoryScores[category]
+      .push(
+        Number(
+          attempt.percentage
+        ) || 0
+      );
+
+  }
+);
+
+
+/* ================================================================
+   FIREDRILL CATEGORY AVERAGES
+   ================================================================ */
+
+const fireCategoryKeys =
+  Object.keys(
+    fireCategoryScores
+  );
+
+
+const fireCategoryLabels =
+  fireCategoryKeys.map(
+    category =>
+      QUIZ_CATEGORY_LABELS[
+        category
+      ] || category
+  );
+
+
+const fireCategoryAverages =
+  fireCategoryKeys.map(
+    category => {
+
+      const values =
+        fireCategoryScores[
+          category
+        ];
+
+
+      const total =
+        values.reduce(
+          (sum, value) =>
+            sum + value,
+          0
+        );
+
+
+      return Math.round(
+        total / values.length
+      );
+
+    }
+  );
+
+
+/* ================================================================
+   FIREDRILL CATEGORY CHART
+   ================================================================ */
+
+const fireCategoryCanvas =
+  document.getElementById(
+    "fireDrillCategoryChart"
+  );
+
+
+const fireCategoryEmpty =
+  document.getElementById(
+    "fireDrillCategoryEmpty"
+  );
+
+
+if (
+  fireCategoryKeys.length > 0
+) {
+
+
+  fireCategoryEmpty.style.display =
+    "none";
+
+
+  new Chart(
+    fireCategoryCanvas,
+    {
+
+      type: "bar",
+
+      data: {
+
+        labels:
+          fireCategoryLabels,
+
+
+        datasets: [
+
+          {
+
+            label:
+              "Accuracy %",
+
+            data:
+              fireCategoryAverages,
+
+            backgroundColor:
+              "#3ED598",
+
+            borderRadius:
+              4
+
+          }
+
+        ]
+
+      },
+
+
+      options: {
+
+        plugins: {
+
+          legend: {
+            display: false
+          }
+
+        },
+
+
+        scales: {
+
+          y: {
+
+            min: 0,
+
+            max: 100,
+
+            grid: {
+              color: "#21303C"
+            }
+
+          },
+
+
+          x: {
+
+            grid: {
+              display: false
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ================================================================
+   NORMAL QUIZ CATEGORY CHART
+   ================================================================ */
+
+const categories =
+  Object.keys(
+    QUIZ_BANK
+  );
+
+
+const categoryAverages =
+  categories.map(
+    category =>
+      Readiness.quizAverageByCategory(
+        data,
+        category
+      ) || 0
+  );
+
+
+new Chart(
+  document.getElementById(
+    "categoryChart"
+  ),
+  {
+
+    type: "bar",
+
+    data: {
+
+      labels:
+        categories.map(
+          category =>
+            QUIZ_CATEGORY_LABELS[
+              category
+            ]
+        ),
+
+
+      datasets: [
+
+        {
+
+          label:
+            "Accuracy %",
+
+          data:
+            categoryAverages,
+
+          backgroundColor:
+            "#F5A623",
+
+          borderRadius:
+            3
+
+        }
+
+      ]
+
+    },
+
+
+    options: {
+
+      plugins: {
+
+        legend: {
+          display: false
+        }
+
+      },
+
+
+      scales: {
+
+        y: {
+
+          min: 0,
+
+          max: 100,
+
+          grid: {
+            color: "#21303C"
+          }
+
+        },
+
+
+        x: {
+
+          grid: {
+            display: false
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+);
+
+
+/* ================================================================
+   NORMAL QUIZ TREND
+   ================================================================ */
+
+const attempts =
+  data.quizAttempts.slice(-15);
+
+
+new Chart(
+  document.getElementById(
+    "trendChart"
+  ),
+  {
+
+    type: "line",
+
+    data: {
+
+      labels:
+        attempts.map(
+          (attempt, index) =>
+            "#" + (index + 1)
+        ),
+
+
+      datasets: [
+
+        {
+
+          label:
+            "Score %",
+
+          data:
+            attempts.map(
+              attempt =>
+                Math.round(
+                  (
+                    attempt.score /
+                    attempt.total
+                  ) * 100
+                )
+            ),
+
+
+          borderColor:
+            "#3ED598",
+
+          backgroundColor:
+            "rgba(62,213,152,.15)",
+
+          tension:
+            .3,
+
+          fill:
+            true,
+
+          pointRadius:
+            3
+
+        }
+
+      ]
+
+    },
+
+
+    options: {
+
+      plugins: {
+
+        legend: {
+          display: false
+        }
+
+      },
+
+
+      scales: {
+
+        y: {
+
+          min: 0,
+
+          max: 100,
+
+          grid: {
+            color: "#21303C"
+          }
+
+        },
+
+
+        x: {
+
+          grid: {
+            display: false
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+);
+
+
+/* ================================================================
+   NO QUIZ ATTEMPTS
+   ================================================================ */
+
+if (!attempts.length) {
+
+  document.getElementById(
+    "trendChart"
+  )
+  .parentElement
+  .innerHTML +=
+
+    '<p class="hint" style="margin-top:var(--s-3);">' +
+
+    'No quiz attempts yet — this will fill in once you practice.' +
+
+    '</p>';
+
+}
+
+
+/* ================================================================
+   READINESS BREAKDOWN
+   ================================================================ */
+
+const breakdown = [
+
+  {
+    label:
+      "Quiz accuracy",
+
+    val:
+      Readiness.quizAverage(
+        data
+      )
+
+  },
+
+
+  {
+    label:
+      "Interview confidence",
+
+    val:
+      Readiness.interviewAverage(
+        data
+      )
+
+  },
+
+
+  {
+    label:
+      "Planner completion",
+
+    val:
+      Readiness.plannerCompletion(
+        data
+      )
+
+  },
+
+
+  {
+    label:
+      "Checklist completion",
+
+    val:
+      Readiness.checklistCompletion(
+        data
+      )
+
+  }
+
+];
+
+
+const breakdownEl =
+  document.getElementById(
+    "breakdownContainer"
+  );
+
+
+breakdown.forEach(
+  item => {
+
+
+    const val =
+      item.val === null
+        ? 0
+        : item.val;
+
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+
+    row.className =
+      "breakdown-row";
+
+
+    row.innerHTML = `
+
+      <span
+        style="
+          width:180px;
+          color:var(--text-dim);
+          font-size:.9rem;
+        "
+      >
+        ${item.label}
+      </span>
+
+
+      <div class="bar">
+
+        <span
+          style="
+            width:${val}%;
+          "
+        ></span>
+
+      </div>
+
+
+      <span class="pct">
+
+        ${
+          item.val === null
+            ? "—"
+            : val + "%"
+        }
+
+      </span>
+
+    `;
+
+
+    breakdownEl.appendChild(
+      row
+    );
+
+  }
+);
+
+
+/* ================================================================
+   INTERVIEW BREAKDOWN
+   ================================================================ */
+
+const interviewEl =
+  document.getElementById(
+    "interviewBreakdown"
+  );
+
+
+const allInterviewQs = [
+
+  ...INTERVIEW_QUESTIONS.hr,
+
+  ...INTERVIEW_QUESTIONS.technical
+
+];
+
+
+const rated =
+  allInterviewQs.filter(
+    question =>
+
+      data.interviewRatings[
+        question.id
+      ]
+
+      &&
+
+      data.interviewRatings[
+        question.id
+      ].length
+
+  );
+
+
+if (!rated.length) {
+
+  interviewEl.innerHTML =
+
+    '<p class="hint">' +
+
+    'No mock interview questions rated yet.' +
+
+    '</p>';
+
+} else {
+
+
+  rated.forEach(
+    question => {
+
+
+      const ratings =
+        data.interviewRatings[
+          question.id
+        ];
+
+
+      const avg =
+        Math.round(
+
+          (
+
+            ratings.reduce(
+              (sum, rating) =>
+                sum + rating,
+              0
+            )
+
+            /
+
+            ratings.length
+
+          ) * 10
+
+        ) / 10;
+
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+
+      row.className =
+        "breakdown-row";
+
+
+      row.innerHTML = `
+
+        <span
+          style="
+            flex:1;
+            color:var(--text-dim);
+            font-size:.88rem;
+          "
+        >
+          ${question.q}
+        </span>
+
+
+        <div
+          class="bar"
+          style="
+            max-width:120px;
+          "
+        >
+
+          <span
+            style="
+              width:${avg / 5 * 100}%;
+            "
+          ></span>
+
+        </div>
+
+
+        <span class="pct">
+          ${avg}/5
+        </span>
+
+      `;
+
+
+      interviewEl.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+</script>
+
 </body>
+
 </html>
