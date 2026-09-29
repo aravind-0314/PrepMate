@@ -373,23 +373,24 @@
             type="button"
             aria-controls="navLinks"
             aria-expanded="false">
-      ☰ Menu
+      â˜° Menu
     </button>
 
     <div class="nav-links" id="navLinks">
-      <a href="dashboard.html">◈ Dashboard</a>
-      <a href="career.html">◎ Career Path</a>
+      <a href="dashboard.html">â—ˆ Dashboard</a>
+      <a href="career.html">â—Ž Career Path</a>
       <a href="practice.html" class="active">
-        ◇ Practice Zone
+        â—‡ Practice Zone
       </a>
-      <a href="interview.html">◎ Mock Interview</a>
-      <a href="planner.html">▤ Study Planner</a>
-      <a href="report.html">▥ Progress Report</a>
+      <a href="firedrill.html">⚡ FireDrill</a>
+      <a href="interview.html">â—Ž Mock Interview</a>
+      <a href="planner.html">â–¤ Study Planner</a>
+      <a href="report.html">â–¥ Progress Report</a>
 
       <button id="mobileLogoutBtn"
               class="mobile-logout"
               type="button">
-        ↪ Sign out
+        â†ª Sign out
       </button>
     </div>
 
@@ -430,7 +431,7 @@
 
           <div class="career-banner-icon"
                id="careerIcon">
-            ◎
+            â—Ž
           </div>
 
           <div>
@@ -460,7 +461,7 @@
                   class="btn btn-primary"
                   type="button"
                   disabled>
-            Start Career Quiz →
+            Start Career Quiz â†’
           </button>
         </div>
       </section>
@@ -521,7 +522,7 @@
           <button id="exitQuizBtn"
                   class="back-btn"
                   type="button">
-            ← Exit Quiz
+            â† Exit Quiz
           </button>
         </div>
 
@@ -578,7 +579,7 @@
 
           <a href="report.html"
              class="btn">
-            View Report →
+            View Report â†’
           </a>
         </div>
 
@@ -648,7 +649,7 @@
 
   if (selectedCareer) {
     $("careerIcon").textContent =
-      selectedCareer.icon || "◎";
+      selectedCareer.icon || "â—Ž";
 
     $("careerName").textContent =
       selectedCareer.name;
@@ -684,7 +685,7 @@
       $("startCareerBtn").disabled = false;
 
       $("startCareerBtn").textContent =
-        "Start Career Quiz →";
+        "Start Career Quiz â†’";
     } else {
       $("startCareerBtn").textContent =
         "Coming Soon";
@@ -747,15 +748,15 @@
 
     result.textContent =
       average === null
-        ? "—"
+        ? "â€”"
         : average + "%";
 
     const action = document.createElement("span");
     action.className = "card-action";
     action.textContent =
       average === null
-        ? "Start Practice →"
-        : "Practice Again →";
+        ? "Start Practice â†’"
+        : "Practice Again â†’";
 
     card.append(
       count,
@@ -842,7 +843,7 @@
 
     $("qProgress").textContent =
       current.title.toUpperCase() +
-      " — QUESTION " +
+      " â€” QUESTION " +
       (current.index + 1) +
       " / " +
       current.questions.length;
